@@ -30,6 +30,7 @@ export interface PlanLimits {
   /** -1 = unlimited */
   manualRunsPerMonth: number
   scheduledRuns: boolean
+  hourlyRuns: boolean
   emailAlerts: boolean
   pdfReports: boolean
   slackAlerts: boolean

@@ -42,6 +42,13 @@ export async function updateScheduleAction(
         planGated: true,
       }
     }
+
+    if (schedule === "hourly" && !limits.hourlyRuns) {
+      return {
+        error: "Monitoramento por hora requer o plano Pro ou superior.",
+        planGated: true,
+      }
+    }
   }
 
   // Compute nextAuditAt: set to soon so the first scheduled run fires promptly
