@@ -168,16 +168,24 @@ export function ScoreHistoryChart({ data }: Props) {
               const crux = payload?.find((p) => p.dataKey === "crux")?.value as number | null | undefined
               return (
                 <div style={{ fontSize: 12, borderRadius: 8, border: "1px solid hsl(var(--border))", background: "hsl(var(--background))", padding: "8px 10px" }}>
-                  <p style={{ fontWeight: 600, marginBottom: 4 }}>{label}</p>
+                  <p style={{ fontWeight: 600, marginBottom: 6 }}>{label}</p>
                   {hasLabLine && (
-                    <p style={{ color: LAB_COLOR, margin: "2px 0" }}>
-                      ⚗ Laboratório: {lab != null ? formatValue(activeTab, lab) : "Sem dados"}
-                    </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "3px 0" }}>
+                      <span style={{ display: "inline-block", width: 10, height: 3, borderRadius: 2, backgroundColor: LAB_COLOR, flexShrink: 0 }} />
+                      <span style={{ color: "hsl(var(--muted-foreground))" }}>Laboratório</span>
+                      <span style={{ fontWeight: 600, marginLeft: "auto", paddingLeft: 12 }}>
+                        {lab != null ? formatValue(activeTab, lab) : "—"}
+                      </span>
+                    </div>
                   )}
                   {hasCruxLine && (
-                    <p style={{ color: CRUX_COLOR, margin: "2px 0" }}>
-                      👥 Usuários reais (P75): {crux != null ? formatValue(activeTab, crux) : "Sem dados"}
-                    </p>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, margin: "3px 0" }}>
+                      <span style={{ display: "inline-block", width: 10, height: 3, borderRadius: 2, background: `repeating-linear-gradient(to right, ${CRUX_COLOR} 0, ${CRUX_COLOR} 4px, transparent 4px, transparent 7px)`, flexShrink: 0 }} />
+                      <span style={{ color: "hsl(var(--muted-foreground))" }}>Usuários reais (P75)</span>
+                      <span style={{ fontWeight: 600, marginLeft: "auto", paddingLeft: 12 }}>
+                        {crux != null ? formatValue(activeTab, crux) : "—"}
+                      </span>
+                    </div>
                   )}
                 </div>
               )
@@ -224,11 +232,6 @@ export function ScoreHistoryChart({ data }: Props) {
       {activeTab === "inp" && (
         <p className="text-xs text-muted-foreground">
           INP não tem dados de laboratório — apenas dados reais de usuários via CrUX.
-        </p>
-      )}
-      {(activeTab === "lcp" || activeTab === "fcp") && (
-        <p className="text-xs text-muted-foreground">
-          Linha sólida azul = laboratório (throttling simulado) · Linha pontilhada roxa = usuários reais Chrome P75.
         </p>
       )}
     </div>
