@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Globe, BookOpen, ListChecks, Bell } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "PerfAlly — Core Web Vitals para fundadores, não engenheiros",
@@ -22,25 +23,25 @@ const gradeColors = {
 
 const features = [
   {
-    icon: "🔗",
+    icon: Globe,
     title: "Cole qualquer URL",
     description:
       "Cole a URL do seu site e receba uma análise completa dos Core Web Vitals em menos de 10 segundos.",
   },
   {
-    icon: "📖",
+    icon: BookOpen,
     title: "Explicações sem jargão",
     description:
       "Sem termos técnicos. Cada métrica explicada em termos do impacto nos seus visitantes e no seu negócio.",
   },
   {
-    icon: "✅",
+    icon: ListChecks,
     title: "Plano de ação priorizado",
     description:
       "Uma lista de correções ranqueadas por impacto — resolva os problemas mais importantes primeiro.",
   },
   {
-    icon: "🔔",
+    icon: Bell,
     title: "Monitoramento automático",
     description:
       "Agende auditorias diárias e receba alertas assim que a performance do seu site cair.",
@@ -115,7 +116,9 @@ export default function HomePage() {
                 key={f.title}
                 className="rounded-xl border bg-white p-6 shadow-sm"
               >
-                <div className="mb-3 text-2xl">{f.icon}</div>
+                <div className="mb-3 text-primary">
+                  <f.icon className="h-6 w-6" />
+                </div>
                 <h3 className="mb-2 font-semibold">{f.title}</h3>
                 <p className="text-muted-foreground text-sm">{f.description}</p>
               </div>
