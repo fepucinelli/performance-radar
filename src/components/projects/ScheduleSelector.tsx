@@ -102,6 +102,13 @@ export function ScheduleSelector({ projectId, currentSchedule, userPlan }: Props
         })}
       </div>
 
+      {/* Daily schedule info */}
+      {selected === "daily" && (
+        <p className="text-xs text-muted-foreground">
+          Auditorias diárias são executadas automaticamente às <span className="font-medium text-foreground">12h00 (horário de Brasília)</span>.
+        </p>
+      )}
+
       {/* Upgrade prompt — shown only for Starter trying to use hourly */}
       {canSchedule && !canHourly && (
         <div className="flex items-center gap-3 rounded-lg border border-dashed bg-muted/30 px-4 py-3">
