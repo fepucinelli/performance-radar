@@ -11,6 +11,7 @@ import { db, projects } from "@/lib/db"
 import { eq } from "drizzle-orm"
 import { env } from "@/env"
 import { runAuditForProject, PSIError } from "@/lib/audit-runner"
+import { tomorrowNoonBRT } from "@/lib/utils/schedule"
 
 export const dynamic = "force-dynamic"
 
@@ -59,12 +60,9 @@ export async function POST(req: Request) {
     await runAuditForProject(projectId, "cron")
 
     // Schedule the next run based on the project's cadence
-    const next = new Date()
-    if (project.schedule === "hourly") {
-      next.setHours(next.getHours() + 1)
-    } else if (project.schedule === "daily") {
-      next.setDate(next.getDate() + 1)
-    }
+    const next = project.schedule === "hourly"
+      ? new Date(Date.now() + 60 * 60 * 1000)
+      : tomorrowNoonBRT()
 
     if (project.schedule !== "manual") {
       await db

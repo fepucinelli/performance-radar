@@ -5,6 +5,7 @@ import { db, projects, users } from "@/lib/db"
 import { eq, and } from "drizzle-orm"
 import { revalidatePath } from "next/cache"
 import { PLAN_LIMITS } from "@/lib/utils/plan-limits"
+import { nextNoonBRT } from "@/lib/utils/schedule"
 
 type Schedule = "manual" | "daily" | "hourly"
 
@@ -51,11 +52,14 @@ export async function updateScheduleAction(
     }
   }
 
-  // Compute nextAuditAt: set to soon so the first scheduled run fires promptly
+  // Compute nextAuditAt for the first scheduled run
   let nextAuditAt: Date | null = null
-  if (schedule !== "manual") {
+  if (schedule === "daily") {
+    // First run at the next noon BRT (12:00 Brasília = 15:00 UTC)
+    nextAuditAt = nextNoonBRT()
+  } else if (schedule === "hourly") {
+    // First run on the next cron tick (within the hour)
     nextAuditAt = new Date()
-    // Add a small buffer so the cron trigger picks it up on the next hourly cycle
     nextAuditAt.setMinutes(nextAuditAt.getMinutes() + 5)
   }
 
