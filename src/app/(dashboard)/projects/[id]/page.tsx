@@ -4,7 +4,7 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import { auth } from "@clerk/nextjs/server"
 import { db, projects, auditResults, users } from "@/lib/db"
-import { eq, and, desc } from "drizzle-orm"
+import { eq, and, desc, gte } from "drizzle-orm"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -20,6 +20,7 @@ import { ScoreHistoryChart } from "@/components/metrics/ScoreHistoryChart"
 import { ScheduleSelector } from "@/components/projects/ScheduleSelector"
 import { AlertThresholds } from "@/components/projects/AlertThresholds"
 import { PLAN_LIMITS } from "@/lib/utils/plan-limits"
+import { getMonthlyRunCount } from "@/app/actions/projects"
 import type { Plan } from "@/lib/db/schema"
 
 export async function generateMetadata({
@@ -53,40 +54,50 @@ export default async function ProjectPage({
   })
   if (!project) notFound()
 
-  // Latest audit result
-  const latestAudit = await db.query.auditResults.findFirst({
-    where: eq(auditResults.projectId, project.id),
-    orderBy: [desc(auditResults.createdAt)],
-  })
-
-  // History for chart + run dots (last 30 runs, oldest-first for the chart)
-  const historyDesc = await db.query.auditResults.findMany({
-    where: eq(auditResults.projectId, project.id),
-    orderBy: [desc(auditResults.createdAt)],
-    limit: 30,
-    columns: {
-      id: true,
-      perfScore: true,
-      lcp: true,
-      cls: true,
-      inp: true,
-      fcp: true,
-      cruxLcp: true,
-      cruxCls: true,
-      cruxInp: true,
-      cruxFcp: true,
-      createdAt: true,
-    },
-  })
-  const history = [...historyDesc].reverse()
-
-  // User plan for ScheduleSelector + AlertThresholds
+  // User plan — needed to determine history window and run limits
   const dbUser = await db.query.users.findFirst({
     where: eq(users.id, userId),
     columns: { plan: true },
   })
   const userPlan: Plan = (dbUser?.plan ?? "free") as Plan
   const planLimits = PLAN_LIMITS[userPlan]
+
+  // History start date based on plan's historyDays limit
+  const historyStart = new Date()
+  historyStart.setDate(historyStart.getDate() - planLimits.historyDays)
+
+  // Fetch latest audit, history, and monthly run count in parallel
+  const [latestAudit, historyDesc, monthlyRunCount] = await Promise.all([
+    db.query.auditResults.findFirst({
+      where: eq(auditResults.projectId, project.id),
+      orderBy: [desc(auditResults.createdAt)],
+    }),
+    db.query.auditResults.findMany({
+      where: and(
+        eq(auditResults.projectId, project.id),
+        gte(auditResults.createdAt, historyStart),
+      ),
+      orderBy: [desc(auditResults.createdAt)],
+      limit: 500,
+      columns: {
+        id: true,
+        perfScore: true,
+        lcp: true,
+        cls: true,
+        inp: true,
+        fcp: true,
+        cruxLcp: true,
+        cruxCls: true,
+        cruxInp: true,
+        cruxFcp: true,
+        createdAt: true,
+      },
+    }),
+    planLimits.manualRunsPerMonth !== -1
+      ? getMonthlyRunCount(userId)
+      : Promise.resolve(-1),
+  ])
+  const history = [...historyDesc].reverse()
 
   return (
     <div className="mx-auto max-w-4xl space-y-6">
@@ -115,7 +126,11 @@ export default async function ProjectPage({
             </Badge>
           </div>
         </div>
-        <RunAuditButton projectId={project.id} />
+        <RunAuditButton
+          projectId={project.id}
+          runsUsed={monthlyRunCount === -1 ? undefined : monthlyRunCount}
+          maxRuns={planLimits.manualRunsPerMonth === -1 ? undefined : planLimits.manualRunsPerMonth}
+        />
       </div>
 
       {latestAudit ? (

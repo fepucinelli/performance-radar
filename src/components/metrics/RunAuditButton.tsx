@@ -7,9 +7,11 @@ import { Zap, Loader2 } from "lucide-react"
 
 interface RunAuditButtonProps {
   projectId: string
+  runsUsed?: number
+  maxRuns?: number
 }
 
-export function RunAuditButton({ projectId }: RunAuditButtonProps) {
+export function RunAuditButton({ projectId, runsUsed, maxRuns }: RunAuditButtonProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
@@ -54,6 +56,11 @@ export function RunAuditButton({ projectId }: RunAuditButtonProps) {
           </>
         )}
       </Button>
+      {maxRuns !== undefined && runsUsed !== undefined && (
+        <p className={`text-xs ${runsUsed >= maxRuns ? "text-red-600" : "text-muted-foreground"}`}>
+          {runsUsed}/{maxRuns} auditorias usadas este mês
+        </p>
+      )}
       {error && (
         <p className="text-sm text-red-600">{error}</p>
       )}

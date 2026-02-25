@@ -182,7 +182,7 @@ export default function HomePage() {
           <p className="text-muted-foreground mb-8 text-base">
             Comece grátis. Faça upgrade quando precisar de mais.
           </p>
-          <div className="mx-auto grid max-w-4xl gap-4 sm:grid-cols-3">
+          <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Free */}
             <div className="rounded-xl border bg-white p-6 shadow-sm">
               <p className="mb-2 font-semibold">Grátis</p>
@@ -216,6 +216,7 @@ export default function HomePage() {
                 <li>✓ Auditorias ilimitadas</li>
                 <li>✓ Monitoramento diário automático</li>
                 <li>✓ Alertas por e-mail</li>
+                <li>✓ Histórico de 30 dias</li>
               </ul>
               <Button className="w-full" asChild>
                 <Link href="/sign-up">Começar período grátis</Link>
@@ -235,6 +236,27 @@ export default function HomePage() {
                 <li>✓ Monitoramento por hora automático</li>
                 <li>✓ Alertas por e-mail + Slack</li>
                 <li>✓ Relatórios em PDF</li>
+                <li>✓ Histórico de 90 dias</li>
+              </ul>
+              <Button className="w-full" variant="outline" asChild>
+                <Link href="/sign-up">Começar período grátis</Link>
+              </Button>
+            </div>
+
+            {/* Agency */}
+            <div className="rounded-xl border bg-white p-6 shadow-sm">
+              <p className="mb-2 font-semibold">Agência</p>
+              <p className="mb-3 text-3xl font-bold">
+                R$499
+                <span className="text-muted-foreground text-sm font-normal">/mês</span>
+              </p>
+              <ul className="text-muted-foreground mb-6 space-y-1 text-left text-sm">
+                <li>✓ 100 projetos</li>
+                <li>✓ Auditorias ilimitadas</li>
+                <li>✓ Monitoramento por hora automático</li>
+                <li>✓ Alertas por e-mail + Slack</li>
+                <li>✓ PDFs white-label</li>
+                <li>✓ Histórico de 1 ano</li>
               </ul>
               <Button className="w-full" variant="outline" asChild>
                 <Link href="/sign-up">Começar período grátis</Link>
