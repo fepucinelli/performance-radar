@@ -48,11 +48,14 @@ export async function runPSIAudit(
     throw new PSIError(message, res.status)
   }
 
+  // CrUX metric shape: percentile is a flat integer (NOT percentiles.p75)
+  // CLS is stored ×100 in CrUX (e.g. 10 → 0.10) — all other metrics are in ms
+  type CrUXMetric = { percentile?: number }
   type CrUXMetrics = {
-    LARGEST_CONTENTFUL_PAINT_MS?: { percentiles?: { p75?: number } }
-    CUMULATIVE_LAYOUT_SHIFT_SCORE?: { percentiles?: { p75?: number } }
-    INTERACTION_TO_NEXT_PAINT?: { percentiles?: { p75?: number } }
-    FIRST_CONTENTFUL_PAINT_MS?: { percentiles?: { p75?: number } }
+    LARGEST_CONTENTFUL_PAINT_MS?: CrUXMetric
+    CUMULATIVE_LAYOUT_SHIFT_SCORE?: CrUXMetric
+    INTERACTION_TO_NEXT_PAINT?: CrUXMetric
+    FIRST_CONTENTFUL_PAINT_MS?: CrUXMetric
   }
   type CrUXExperience = { metrics?: CrUXMetrics }
 
@@ -70,9 +73,11 @@ export async function runPSIAudit(
   const pageMetrics = data.loadingExperience?.metrics
   const originMetrics = data.originLoadingExperience?.metrics
   const crux = (key: keyof CrUXMetrics): number | null =>
-    pageMetrics?.[key]?.percentiles?.p75 ??
-    originMetrics?.[key]?.percentiles?.p75 ??
+    pageMetrics?.[key]?.percentile ??
+    originMetrics?.[key]?.percentile ??
     null
+
+  const rawCruxCls = crux("CUMULATIVE_LAYOUT_SHIFT_SCORE")
 
   return {
     perfScore: Math.round((lhr.categories.performance.score ?? 0) * 100),
@@ -87,7 +92,7 @@ export async function runPSIAudit(
     speedIndex: getNumericValue(lhr, "speed-index"),
     // CrUX field data — page-level preferred, origin-level as fallback
     cruxLcp: crux("LARGEST_CONTENTFUL_PAINT_MS"),
-    cruxCls: crux("CUMULATIVE_LAYOUT_SHIFT_SCORE"),
+    cruxCls: rawCruxCls !== null ? rawCruxCls / 100 : null,
     cruxInp: crux("INTERACTION_TO_NEXT_PAINT"),
     cruxFcp: crux("FIRST_CONTENTFUL_PAINT_MS"),
     lighthouseRaw: lhr,
