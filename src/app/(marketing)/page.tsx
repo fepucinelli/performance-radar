@@ -4,14 +4,14 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 
 export const metadata: Metadata = {
-  title: "Performance Radar — Core Web Vitals para fundadores, não engenheiros",
+  title: "PerfAlly — Core Web Vitals para fundadores, não engenheiros",
 }
 
-// Static metric examples for the hero section
+// Static metric examples for the hero section — intentionally a bad site
 const metrics = [
-  { name: "LCP", value: "2,1s", grade: "good", label: "Maior Elemento Visível" },
-  { name: "INP", value: "180ms", grade: "good", label: "Interação até Próxima Pintura" },
-  { name: "CLS", value: "0,08", grade: "good", label: "Mudança de Layout Acumulada" },
+  { name: "LCP", value: "8,4s", grade: "poor", gradeLabel: "Ruim", label: "Maior Elemento Visível" },
+  { name: "INP", value: "920ms", grade: "poor", gradeLabel: "Ruim", label: "Interação até Próxima Pintura" },
+  { name: "CLS", value: "0,38", grade: "poor", gradeLabel: "Ruim", label: "Mudança de Layout Acumulada" },
 ]
 
 const gradeColors = {
@@ -79,11 +79,11 @@ export default function HomePage() {
         <div className="mx-auto mt-12 max-w-lg rounded-xl border bg-white p-6 shadow-sm">
           <div className="mb-4 flex items-center justify-between">
             <div className="text-left">
-              <p className="text-sm font-medium">seusite.com.br</p>
+              <p className="text-sm font-medium">minha-loja.com.br</p>
               <p className="text-muted-foreground text-xs">Mobile · há 2 segundos</p>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="text-2xl font-bold">84</span>
+              <span className="text-2xl font-bold text-red-600">23</span>
               <span className="text-muted-foreground text-sm">/100</span>
             </div>
           </div>
@@ -95,7 +95,7 @@ export default function HomePage() {
                 <span
                   className={`mt-1 inline-block rounded px-1.5 py-0.5 text-xs font-medium ${gradeColors[m.grade as keyof typeof gradeColors]}`}
                 >
-                  Bom
+                  {m.gradeLabel}
                 </span>
               </div>
             ))}
