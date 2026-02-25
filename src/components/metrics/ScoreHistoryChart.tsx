@@ -12,6 +12,7 @@ import {
   CartesianGrid,
 } from "recharts"
 import { THRESHOLDS } from "@/lib/utils/metrics"
+import { FlaskConical, Users } from "lucide-react"
 
 interface DataPoint {
   createdAt: Date
@@ -19,6 +20,9 @@ interface DataPoint {
   lcp: number | null
   cls: number | null
   inp: number | null
+  cruxLcp: number | null
+  cruxCls: number | null
+  cruxInp: number | null
 }
 
 interface Props {
@@ -35,18 +39,19 @@ const TABS: { key: Tab; label: string }[] = [
 ]
 
 // Reference lines (good / poor thresholds) per tab
-const REFS: Record<
-  Tab,
-  { good: number; poor: number; unit: string } | null
-> = {
-  score: { good: 90, poor: 50, unit: "" },
-  lcp: { good: THRESHOLDS.lcp.good, poor: THRESHOLDS.lcp.poor, unit: "ms" },
-  cls: { good: THRESHOLDS.cls.good, poor: THRESHOLDS.cls.poor, unit: "" },
-  inp: { good: THRESHOLDS.inp.good, poor: THRESHOLDS.inp.poor, unit: "ms" },
+const REFS: Record<Tab, { good: number; poor: number } | null> = {
+  score: { good: 90, poor: 50 },
+  lcp: { good: THRESHOLDS.lcp.good, poor: THRESHOLDS.lcp.poor },
+  cls: { good: THRESHOLDS.cls.good, poor: THRESHOLDS.cls.poor },
+  inp: { good: THRESHOLDS.inp.good, poor: THRESHOLDS.inp.poor },
 }
 
+// Lab line = blue; CrUX line = violet
+const LAB_COLOR = "#2563eb"
+const CRUX_COLOR = "#7c3aed"
+
 function formatDate(d: Date) {
-  return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+  return new Date(d).toLocaleDateString("pt-BR", { month: "short", day: "numeric" })
 }
 
 function formatValue(tab: Tab, value: number) {
@@ -55,26 +60,10 @@ function formatValue(tab: Tab, value: number) {
   return value >= 1000 ? `${(value / 1000).toFixed(1)}s` : `${Math.round(value)}ms`
 }
 
-// Determine line color based on tab and the last value
-function lineColor(tab: Tab, data: DataPoint[]): string {
-  const last = data[data.length - 1]
-  if (!last) return "#6b7280"
-
-  if (tab === "score") {
-    const score = last.perfScore ?? 0
-    if (score >= 90) return "#16a34a"
-    if (score >= 50) return "#d97706"
-    return "#dc2626"
-  }
-
-  const refs = REFS[tab]
-  if (!refs) return "#6b7280"
-
-  const value = last[tab] ?? 0
-  // For score-like metrics: lower value is better for LCP/INP/CLS
-  if (value <= refs.good) return "#16a34a"
-  if (value <= refs.poor) return "#d97706"
-  return "#dc2626"
+function yAxisFormatter(tab: Tab, v: number) {
+  if (tab === "score") return String(v)
+  if (tab === "cls") return v.toFixed(2)
+  return v >= 1000 ? `${(v / 1000).toFixed(0)}s` : `${v}`
 }
 
 export function ScoreHistoryChart({ data }: Props) {
@@ -90,37 +79,64 @@ export function ScoreHistoryChart({ data }: Props) {
     )
   }
 
-  const chartData = data.map((d) => ({
-    date: formatDate(d.createdAt),
-    value: activeTab === "score" ? (d.perfScore ?? null) : d[activeTab],
-  }))
+  // Score tab has no CrUX equivalent; INP has no lab equivalent
+  const hasLabLine = activeTab !== "inp"
+  const hasCruxLine = activeTab !== "score"
+
+  const chartData = data.map((d) => {
+    const lab: number | null =
+      activeTab === "score" ? d.perfScore :
+      activeTab === "lcp" ? d.lcp :
+      activeTab === "cls" ? d.cls :
+      null // inp has no lab value
+
+    const crux: number | null =
+      activeTab === "lcp" ? d.cruxLcp :
+      activeTab === "cls" ? d.cruxCls :
+      activeTab === "inp" ? d.cruxInp :
+      null // score has no crux equivalent
+
+    return { date: formatDate(d.createdAt), lab, crux }
+  })
 
   const refs = REFS[activeTab]
-  const color = lineColor(activeTab, data)
-
-  const tooltipFormatter = (value: number | undefined) => [
-    value != null ? formatValue(activeTab, value) : "—",
-    activeTab === "score" ? "Pontuação" : activeTab.toUpperCase(),
-  ]
 
   return (
     <div className="space-y-3">
-      {/* Tab switcher */}
-      <div className="flex gap-1">
-        {TABS.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
-            className={[
-              "rounded-md px-3 py-1 text-xs font-medium transition-colors",
-              activeTab === tab.key
-                ? "bg-foreground text-background"
-                : "text-muted-foreground hover:text-foreground",
-            ].join(" ")}
-          >
-            {tab.label}
-          </button>
-        ))}
+      {/* Tab switcher + legend */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex gap-1">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveTab(tab.key)}
+              className={[
+                "rounded-md px-3 py-1 text-xs font-medium transition-colors",
+                activeTab === tab.key
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground",
+              ].join(" ")}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          {hasLabLine && (
+            <span className="flex items-center gap-1.5">
+              <FlaskConical className="h-3 w-3" style={{ color: LAB_COLOR }} />
+              <span style={{ color: LAB_COLOR }} className="font-medium">Laboratório</span>
+            </span>
+          )}
+          {hasCruxLine && (
+            <span className="flex items-center gap-1.5">
+              <Users className="h-3 w-3" style={{ color: CRUX_COLOR }} />
+              <span style={{ color: CRUX_COLOR }} className="font-medium">Usuários reais (P75)</span>
+            </span>
+          )}
+        </div>
       </div>
 
       <ResponsiveContainer width="100%" height={200}>
@@ -137,10 +153,13 @@ export function ScoreHistoryChart({ data }: Props) {
             tickLine={false}
             axisLine={false}
             width={36}
-            tickFormatter={(v) => (activeTab === "score" ? String(v) : v >= 1000 ? `${(v / 1000).toFixed(0)}s` : `${v}`)}
+            tickFormatter={(v) => yAxisFormatter(activeTab, v)}
           />
           <Tooltip
-            formatter={tooltipFormatter}
+            formatter={(value: number | undefined, name: string | undefined) => [
+              value != null ? formatValue(activeTab, value) : "—",
+              name === "lab" ? "Laboratório (simulado)" : "Usuários reais (P75)",
+            ]}
             contentStyle={{
               fontSize: 12,
               borderRadius: 8,
@@ -149,35 +168,48 @@ export function ScoreHistoryChart({ data }: Props) {
             }}
           />
 
-          {/* Reference lines at thresholds */}
+          {/* Threshold reference lines */}
           {refs && (
             <>
-              <ReferenceLine
-                y={refs.good}
-                stroke="#16a34a"
-                strokeDasharray="4 4"
-                strokeOpacity={0.5}
-              />
-              <ReferenceLine
-                y={refs.poor}
-                stroke="#dc2626"
-                strokeDasharray="4 4"
-                strokeOpacity={0.5}
-              />
+              <ReferenceLine y={refs.good} stroke="#16a34a" strokeDasharray="4 4" strokeOpacity={0.5} />
+              <ReferenceLine y={refs.poor} stroke="#dc2626" strokeDasharray="4 4" strokeOpacity={0.5} />
             </>
           )}
 
-          <Line
-            type="monotone"
-            dataKey="value"
-            stroke={color}
-            strokeWidth={2}
-            dot={{ r: 3, fill: color, strokeWidth: 0 }}
-            activeDot={{ r: 5 }}
-            connectNulls={false}
-          />
+          {/* Lab line */}
+          {hasLabLine && (
+            <Line
+              type="monotone"
+              dataKey="lab"
+              stroke={LAB_COLOR}
+              strokeWidth={2}
+              dot={{ r: 3, fill: LAB_COLOR, strokeWidth: 0 }}
+              activeDot={{ r: 5 }}
+              connectNulls={false}
+            />
+          )}
+
+          {/* CrUX real-user line (dashed) */}
+          {hasCruxLine && (
+            <Line
+              type="monotone"
+              dataKey="crux"
+              stroke={CRUX_COLOR}
+              strokeWidth={2}
+              strokeDasharray="5 3"
+              dot={{ r: 3, fill: CRUX_COLOR, strokeWidth: 0 }}
+              activeDot={{ r: 5 }}
+              connectNulls={false}
+            />
+          )}
         </LineChart>
       </ResponsiveContainer>
+
+      {activeTab === "inp" && (
+        <p className="text-xs text-muted-foreground">
+          INP não tem dados de laboratório — apenas dados reais de usuários via CrUX.
+        </p>
+      )}
     </div>
   )
 }
