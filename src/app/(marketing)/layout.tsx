@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { Zap } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export default function MarketingLayout({
@@ -14,7 +15,8 @@ export default function MarketingLayout({
             href="/"
             className="flex items-center gap-2 font-semibold tracking-tight"
           >
-            ⚡ PerfAlly
+            <Zap className="h-4 w-4 text-amber-500" />
+            PerfAlly
           </Link>
           <nav className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
