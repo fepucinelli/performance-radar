@@ -70,9 +70,11 @@ export default async function ProjectPage({
       lcp: true,
       cls: true,
       inp: true,
+      fcp: true,
       cruxLcp: true,
       cruxCls: true,
       cruxInp: true,
+      cruxFcp: true,
       createdAt: true,
     },
   })
