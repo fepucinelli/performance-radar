@@ -20,20 +20,23 @@ interface DataPoint {
   lcp: number | null
   cls: number | null
   inp: number | null
+  fcp: number | null
   cruxLcp: number | null
   cruxCls: number | null
   cruxInp: number | null
+  cruxFcp: number | null
 }
 
 interface Props {
   data: DataPoint[]
 }
 
-type Tab = "score" | "lcp" | "cls" | "inp"
+type Tab = "score" | "lcp" | "fcp" | "cls" | "inp"
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "score", label: "Pontuação" },
   { key: "lcp", label: "LCP" },
+  { key: "fcp", label: "FCP" },
   { key: "cls", label: "CLS" },
   { key: "inp", label: "INP" },
 ]
@@ -42,6 +45,7 @@ const TABS: { key: Tab; label: string }[] = [
 const REFS: Record<Tab, { good: number; poor: number } | null> = {
   score: { good: 90, poor: 50 },
   lcp: { good: THRESHOLDS.lcp.good, poor: THRESHOLDS.lcp.poor },
+  fcp: { good: THRESHOLDS.fcp.good, poor: THRESHOLDS.fcp.poor },
   cls: { good: THRESHOLDS.cls.good, poor: THRESHOLDS.cls.poor },
   inp: { good: THRESHOLDS.inp.good, poor: THRESHOLDS.inp.poor },
 }
@@ -86,12 +90,14 @@ export function ScoreHistoryChart({ data }: Props) {
   const chartData = data.map((d) => {
     const lab: number | null =
       activeTab === "score" ? d.perfScore :
-      activeTab === "lcp" ? d.lcp :
-      activeTab === "cls" ? d.cls :
+      activeTab === "lcp"   ? d.lcp :
+      activeTab === "fcp"   ? d.fcp :
+      activeTab === "cls"   ? d.cls :
       null // inp has no lab value
 
     const crux: number | null =
       activeTab === "lcp" ? d.cruxLcp :
+      activeTab === "fcp" ? d.cruxFcp :
       activeTab === "cls" ? d.cruxCls :
       activeTab === "inp" ? d.cruxInp :
       null // score has no crux equivalent
@@ -218,6 +224,11 @@ export function ScoreHistoryChart({ data }: Props) {
       {activeTab === "inp" && (
         <p className="text-xs text-muted-foreground">
           INP não tem dados de laboratório — apenas dados reais de usuários via CrUX.
+        </p>
+      )}
+      {(activeTab === "lcp" || activeTab === "fcp") && (
+        <p className="text-xs text-muted-foreground">
+          Linha sólida azul = laboratório (throttling simulado) · Linha pontilhada roxa = usuários reais Chrome P75.
         </p>
       )}
     </div>
