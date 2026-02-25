@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Settings } from "lucide-react"
+import { LayoutDashboard, Settings, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -29,7 +29,8 @@ export function Sidebar() {
           href="/dashboard"
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
-          ⚡ PerfAlly
+          <Zap className="h-4 w-4 text-amber-500" />
+          PerfAlly
         </Link>
       </div>
 
