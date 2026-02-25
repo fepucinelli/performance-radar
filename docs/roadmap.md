@@ -1,0 +1,258 @@
+# Roadmap
+
+Each phase is designed to be independently shippable and generate value. Ship Phase 1 to validate demand before building Phase 2.
+
+---
+
+## Phase Overview
+
+```
+Phase 0 — Foundation        (Week 1–2)    Infrastructure, scaffold, CI/CD
+Phase 1 — MVP               (Week 3–5)    Core product, free tier live
+Phase 2 — Pro               (Week 6–8)    Paid subscriptions, alerts, history
+Phase 3 — Agency            (Week 9–12)   PDF reports, teams, white-label
+Phase 4 — Growth            (Month 4–6)   Integrations, AI explanations, SEO
+Phase 5 — Scale             (Month 6+)    API, plugins, advanced auditing
+```
+
+---
+
+## Phase 0 — Foundation
+
+**Goal:** Working Next.js app deployed to Vercel, with auth, DB, and CI/CD in place. No product features yet.
+
+**Checklist:**
+- [ ] Init Next.js 15 with TypeScript, Tailwind, shadcn/ui
+- [ ] Configure Clerk (auth middleware, sign-in/sign-up pages)
+- [ ] Set up Neon PostgreSQL + Drizzle ORM
+- [ ] Create initial DB schema (users, projects, audit_results)
+- [ ] Deploy to Vercel (production + preview envs)
+- [ ] Set up Sentry for error tracking
+- [ ] `.env.example` with all required variables documented
+- [ ] Basic landing page (can be placeholder)
+- [ ] Protected dashboard skeleton (just the layout, no data)
+
+**Deliverable:** A deployed app where you can sign up, sign in, and see an empty dashboard.
+
+See [`phase-0-foundation.md`](./phase-0-foundation.md) for detailed steps.
+
+---
+
+## Phase 1 — MVP
+
+**Goal:** A founder can plug in a URL, run a Lighthouse audit, and get a plain-English report. Free tier: 1 project, 10 manual runs.
+
+**Checklist:**
+- [ ] URL input form with validation
+- [ ] PSI API integration (mobile + desktop strategy)
+- [ ] Parse and store audit results in DB
+- [ ] Metric cards: LCP, INP, CLS, FCP, TTFB with color grading
+- [ ] Plain-English explanation for each metric
+- [ ] Action Plan section: top 5 prioritized issues from audit
+- [ ] Lighthouse audit list (collapsible, full detail available)
+- [ ] CrUX field data display (with fallback if not available)
+- [ ] Project list page
+- [ ] Single project view with latest audit
+- [ ] Free plan enforcement (1 project, 10 runs/month)
+- [ ] "Share" link for public audit results (no auth required to view)
+
+**Nice to have (if time allows):**
+- [ ] Mobile vs Desktop toggle
+- [ ] Keyboard shortcut to re-run audit
+
+**Deliverable:** A publicly accessible product. Post on X/HN/Indie Hackers. Start collecting waitlist emails.
+
+**Success metric:** 100 free accounts created within first month.
+
+See [`phase-1-mvp.md`](./phase-1-mvp.md) for detailed steps.
+
+---
+
+## Phase 2 — Pro
+
+**Goal:** Monetize. Scheduled monitoring, email alerts, and historical trend charts justify the subscription price.
+
+**Checklist:**
+- [ ] Stripe integration (Starter $19/month, Pro $49/month)
+- [ ] Stripe Customer Portal (self-service subscription management)
+- [ ] Upgrade/downgrade flow from dashboard
+- [ ] Plan enforcement gates on dashboard (upgrade prompts)
+- [ ] Scheduled audits via Vercel Cron + QStash
+  - [ ] Projects have `schedule` field (manual | daily | hourly)
+  - [ ] Cron trigger runs every hour, fans out to QStash jobs
+  - [ ] Each job: calls PSI, stores result, checks alert conditions
+- [ ] Email alerts (via Resend) when metrics degrade past threshold
+  - [ ] Per-metric thresholds configurable per project
+  - [ ] Alert history in dashboard
+  - [ ] Unsubscribe/mute support
+- [ ] Historical trend charts (last 30 days by default)
+  - [ ] Line chart: performance score over time
+  - [ ] Line chart: each CWV over time
+  - [ ] Regression detection (show when score dropped)
+- [ ] Multi-project dashboard (card grid overview)
+- [ ] Improved project settings page
+
+**Deliverable:** First paying customers. Goal: 10 paying customers by end of Phase 2.
+
+**Success metric:** MRR > $200 after launch.
+
+See [`phase-2-pro.md`](./phase-2-pro.md) for detailed steps.
+
+---
+
+## Phase 3 — Agency
+
+**Goal:** Unlock the agency use case — the highest-value customers who pay $99/month and manage multiple client sites.
+
+**Checklist:**
+- [ ] Agency plan ($99/month, 100 projects)
+- [ ] PDF report generation (@react-pdf/renderer)
+  - [ ] Branded Performance Radar header
+  - [ ] Executive summary (score, grade, key findings)
+  - [ ] Per-metric section with explanation + recommendations
+  - [ ] Action plan table
+  - [ ] Historical chart (last 30 days) embedded as image
+- [ ] White-label PDF reports (Pro/Agency)
+  - [ ] Custom logo upload (Vercel Blob)
+  - [ ] Custom accent color
+  - [ ] Custom footer text (agency name, contact info)
+- [ ] Multi-user (teams via Clerk Organizations)
+  - [ ] Invite team members
+  - [ ] Role: Owner, Member
+  - [ ] Billing tied to Organization, not individual
+- [ ] Project tags/grouping (group by client)
+- [ ] Bulk audit: trigger all projects at once
+- [ ] Scheduled weekly digest email (summary of all projects)
+
+**Deliverable:** Product-market fit for the agency segment. Unlock referrals via white-label.
+
+**Success metric:** 3 agency plan customers.
+
+See [`phase-3-agency.md`](./phase-3-agency.md) for detailed steps.
+
+---
+
+## Phase 4 — Growth
+
+**Goal:** Grow via integrations, content, and product-led virality.
+
+**Checklist:**
+- [ ] Slack alerts (in addition to email)
+- [ ] Webhook notifications (custom HTTP endpoint)
+- [ ] Public performance badge (embeddable `<img>` showing current score)
+  - [ ] `GET /api/badge/{projectId}` returns SVG
+  - [ ] Powers product virality — badge links back to Performance Radar
+- [ ] Competitor comparison
+  - [ ] Compare your site vs competitor URL side-by-side
+  - [ ] Available on Pro+
+- [ ] AI-powered action plans (Claude API)
+  - [ ] Instead of static explanations, generate personalized recommendations
+  - [ ] Context-aware: explain WHY the fix matters for their type of site
+  - [ ] Prompt includes audit JSON + site URL + business context
+- [ ] SEO score integration
+  - [ ] Lighthouse SEO audit scores (already in Lighthouse, just surface them)
+  - [ ] Combined "Site Health" score (performance + SEO + accessibility)
+- [ ] CrUX History API integration (25 weeks of field data)
+- [ ] "Performance Budget" feature
+  - [ ] Set target scores per project
+  - [ ] Alert if budget is exceeded after a deploy
+- [ ] Onboarding improvements
+  - [ ] Interactive first-run experience
+  - [ ] Demo project (pre-loaded with example data)
+
+**Deliverable:** Meaningful organic growth. Product advocates.
+
+See [`phase-4-growth.md`](./phase-4-growth.md) for detailed steps.
+
+---
+
+## Phase 5 — Scale
+
+**Goal:** Build the ecosystem around Performance Radar. Developer-friendly features and platform integrations.
+
+**Checklist:**
+- [ ] Public REST API
+  - [ ] API key management in dashboard
+  - [ ] POST /v1/audits — trigger an audit
+  - [ ] GET /v1/audits/{id} — get result
+  - [ ] GET /v1/projects — list projects
+  - [ ] Documented with OpenAPI spec
+  - [ ] Rate-limited per plan
+- [ ] GitHub Action
+  - [ ] `performance-radar/audit-action`
+  - [ ] Runs audit on PR, posts comment with score diff
+  - [ ] Blocks merge if performance regresses beyond budget
+- [ ] WordPress plugin
+  - [ ] Auto-registers site on install
+  - [ ] Shows dashboard widget with current scores
+- [ ] Zapier / Make integration
+  - [ ] Trigger: "Audit completed"
+  - [ ] Trigger: "Score degraded"
+  - [ ] Action: "Run audit"
+- [ ] Custom Lighthouse configuration
+  - [ ] Block third-party requests
+  - [ ] Custom throttling profiles
+  - [ ] Requires dedicated worker (Fly.io) — not PSI API
+- [ ] Multi-region scheduling
+  - [ ] Run audits from US, EU, APAC
+  - [ ] Show latency variance by region
+
+**Deliverable:** Developer-friendly platform. Referrals from GitHub stars.
+
+See [`phase-5-scale.md`](./phase-5-scale.md) for detailed steps.
+
+---
+
+## Complementary Ideas to Explore
+
+These are adjacent ideas worth evaluating once core revenue is stable:
+
+### "One-time audit" product (Phase 3+)
+A $29 one-time purchase for a full report PDF with custom recommendations. No subscription. Targets consultants and freelancers who need a deliverable for a client. Zero account required.
+
+### Performance regression as a service (Phase 5)
+"Did your last deploy break performance?" integrates with Vercel, Netlify, GitHub deploy hooks. When a new deploy happens, auto-trigger an audit and compare with previous. Email if regression > 10%.
+
+### Lighthouse as an API (Phase 5)
+White-label the audit engine. Charge per-call for developers who want Lighthouse results without running infra. Simple pricing: $0.01/audit. Targets agencies building their own tools.
+
+### Managed CrUX insights newsletter (Phase 4)
+Weekly email: "Here's how your site changed vs last week." Personalized, automated, no dashboard needed. Converts free users who don't log in.
+
+### Vertical SaaS editions (Phase 5+)
+- Performance Radar for Shopify (connect store, auto-detect product/checkout pages)
+- Performance Radar for WordPress (plugin-based, auto-discover posts)
+- Performance Radar for Next.js (GitHub integration, per-route tracking)
+
+---
+
+## Pricing Evolution Path
+
+**Start (Phase 1):**
+- Free: 1 project, manual only
+
+**Phase 2:**
+- Free: 1 project, 10 runs/month
+- Starter $19: 5 projects, daily monitoring, email alerts
+- Pro $49: 20 projects, hourly monitoring, all alerts
+
+**Phase 3:**
+- Add Agency $99: 100 projects, teams, PDF reports, white-label
+
+**Phase 4+:**
+- Consider annual pricing (2 months free = 17% discount)
+- Consider usage-based add-ons (extra projects, extra runs)
+- Consider LTD (lifetime deal) on AppSumo for growth spike
+
+---
+
+## Key Risks & Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| PSI API rate limits | Use API key, cache results, Upstash rate limiter |
+| CrUX data unavailable for small sites | Lab-only mode with clear UI explanation |
+| PSI API goes down | Retry with exponential backoff in QStash |
+| Lighthouse scores fluctuate between runs | Show moving average, document methodology |
+| Low CWV awareness in SMB market | Content marketing, education in onboarding |
+| Churn due to "set and forget" | Weekly digest email keeps users engaged |
