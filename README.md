@@ -4,8 +4,6 @@
 
 A SaaS for web performance monitoring targeting small businesses and agencies. Enter a URL, get a plain-language diagnosis of your Core Web Vitals, a prioritized action plan, and scheduled alerts when things regress.
 
-**Built as both a real product and a portfolio project** — fully functional, production-ready, deployable to Vercel.
-
 ---
 
 ## What It Is
