@@ -14,6 +14,7 @@ import { db, projects } from "@/lib/db"
 import { ne, or, isNull, lte, eq } from "drizzle-orm"
 import { env } from "@/env"
 import { runAuditForProject } from "@/lib/audit-runner"
+import { tomorrowNoonBRT } from "@/lib/utils/schedule"
 
 export const dynamic = "force-dynamic"
 
@@ -76,12 +77,9 @@ async function updateNextAuditAt(
   projectId: string,
   schedule: "manual" | "daily" | "hourly"
 ) {
-  const next = new Date()
-  if (schedule === "hourly") {
-    next.setHours(next.getHours() + 1)
-  } else {
-    next.setDate(next.getDate() + 1)
-  }
+  const next = schedule === "hourly"
+    ? new Date(Date.now() + 60 * 60 * 1000)
+    : tomorrowNoonBRT()
 
   await db
     .update(projects)
