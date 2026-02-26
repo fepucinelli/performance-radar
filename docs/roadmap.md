@@ -1,6 +1,6 @@
 # Roadmap
 
-Each phase is designed to be independently shippable and generate value. Ship Phase 1 to validate demand before building Phase 2.
+Each phase is independently shippable and designed to generate value. Ship Phase 1 to validate demand before building Phase 2.
 
 ---
 
@@ -9,9 +9,9 @@ Each phase is designed to be independently shippable and generate value. Ship Ph
 ```
 Phase 0 — Foundation ✅     (Week 1–2)    Infrastructure, scaffold, CI/CD
 Phase 1 — MVP ✅            (Week 3–5)    Core product, free tier live
-Phase 2 — Pro ✅            (Week 6–8)    Paid subscriptions, alerts, history
+Phase 2 — Pro ✅            (Week 6–8)    Paid plans, alerts, history, SEO audits, AI
 Phase 3 — Agency            (Week 9–12)   PDF reports, teams, white-label
-Phase 4 — Growth            (Month 4–6)   Integrations, AI explanations, SEO
+Phase 4 — Growth            (Month 4–6)   Integrations, virality, competitor analysis
 Phase 5 — Scale             (Month 6+)    API, plugins, advanced auditing
 ```
 
@@ -40,11 +40,11 @@ See [`phase-0-foundation.md`](./phase-0-foundation.md) for detailed steps.
 
 ## Phase 1 — MVP
 
-**Goal:** A founder can plug in a URL, run a Lighthouse audit, and get a plain-English report. Free tier: 1 project, 10 manual runs.
+**Goal:** A developer or agency can plug in a URL, run a Lighthouse audit, and get a plain-English report. Free tier: 1 project, 5 manual runs/month.
 
 **Checklist:**
 - [x] URL input form with validation
-- [x] PSI API integration (mobile + desktop strategy)
+- [x] PSI API integration (mobile + desktop strategy) — all 4 Lighthouse categories
 - [x] Parse and store audit results in DB
 - [x] Metric cards: LCP, INP, CLS, FCP, TTFB with color grading
 - [x] Plain-English explanation for each metric
@@ -53,12 +53,9 @@ See [`phase-0-foundation.md`](./phase-0-foundation.md) for detailed steps.
 - [x] CrUX field data display (with fallback if not available)
 - [x] Project list page
 - [x] Single project view with latest audit
-- [x] Free plan enforcement (1 project, 10 runs/month)
+- [x] Free plan enforcement (1 project, 5 runs/month)
 - [x] "Share" link for public audit results (no auth required to view)
-
-**Nice to have (if time allows):**
 - [x] Mobile vs Desktop toggle
-- [x] Keyboard shortcut to re-run audit
 
 **Deliverable:** A publicly accessible product. Post on X/HN/Indie Hackers. Start collecting waitlist emails.
 
@@ -70,10 +67,10 @@ See [`phase-1-mvp.md`](./phase-1-mvp.md) for detailed steps.
 
 ## Phase 2 — Pro
 
-**Goal:** Monetize. Scheduled monitoring, email alerts, historical trend charts, and AI-powered action plans justify the subscription price.
+**Goal:** Monetize. Scheduled monitoring, email alerts, historical trend charts, AI-powered action plans, SEO + accessibility audits, and CrUX History data justify the subscription price.
 
 **Checklist:**
-- [x] Stripe integration (Starter R$99/month, Pro R$249/month, Agência R$499/month)
+- [x] Stripe integration (Freelancer R$89/mês, Studio R$199/mês, Agência R$449/mês)
 - [x] Stripe Customer Portal (self-service subscription management)
 - [x] Upgrade/downgrade flow from dashboard
 - [x] Plan enforcement gates on dashboard (upgrade prompts)
@@ -84,24 +81,32 @@ See [`phase-1-mvp.md`](./phase-1-mvp.md) for detailed steps.
 - [x] Email alerts (via Resend) when metrics degrade past threshold
   - [x] Per-metric thresholds configurable per project
   - [x] Alert history in dashboard
-  - [x] Unsubscribe/mute support
-- [x] Historical trend charts (last 30 days by default)
+- [x] Historical trend charts
   - [x] Line chart: performance score over time
-  - [x] Line chart: each CWV over time
-  - [x] Regression detection (show when score dropped)
+  - [x] Line chart: each CWV over time (LCP, FCP, CLS, INP)
+  - [x] Regression detection (score dropped indicator)
 - [x] Multi-project dashboard (card grid overview)
-- [x] Improved project settings page
-- [x] AI-powered action plans (Claude Haiku) — promoted from Phase 4
-  - [x] Tiered limits: Starter=5/mo, Pro=30/mo, Agency=unlimited
+- [x] AI-powered action plans (Claude Haiku)
+  - [x] Tiered limits: Freelancer=5/mo, Studio=30/mo, Agency=unlimited
   - [x] Stack auto-detection via Lighthouse stackPacks
-  - [x] All 5 CWV metrics in context (LCP, INP, CLS, FCP, TTFB)
-  - [x] PT-BR output for non-technical founders
-  - [x] Cached in audit_results.ai_action_plan (no regeneration cost)
+  - [x] All 5 CWV metrics + SEO/A11y scores in context
+  - [x] PT-BR output for developers and agencies
+  - [x] Cached in `audit_results.ai_action_plan` (no regeneration cost)
   - [x] Graceful fallback to static plan if API key missing or limit reached
+- [x] SEO + Accessibility audits — promoted from Phase 4
+  - [x] PSI API requests all 4 Lighthouse categories (performance, seo, accessibility, best-practices)
+  - [x] `seo_score`, `accessibility_score`, `best_practices_score` columns in DB
+  - [x] SiteHealthCard: composite score (perf×0.4 + seo×0.3 + a11y×0.3) in 2×2 grid
+  - [x] SEOAuditList: failing SEO + accessibility items with PT-BR labels
+- [x] CrUX History API — promoted from Phase 4
+  - [x] 25 weeks of weekly P75 real-user data per metric
+  - [x] Stored in `audit_results.crux_history_raw` (JSONB)
+  - [x] "Usuários reais · 25 sem." view in history chart (LCP, FCP, CLS, INP)
+  - [x] Falls back gracefully if URL not in CrUX dataset
 
 **Deliverable:** First paying customers. Goal: 10 paying customers by end of Phase 2.
 
-**Success metric:** MRR > $200 after launch.
+**Success metric:** MRR > R$900 after launch.
 
 See [`phase-2-pro.md`](./phase-2-pro.md) for detailed steps.
 
@@ -109,21 +114,18 @@ See [`phase-2-pro.md`](./phase-2-pro.md) for detailed steps.
 
 ## Phase 3 — Agency
 
-**Goal:** Unlock the agency use case — the highest-value customers who pay $99/month and manage multiple client sites.
+**Goal:** Unlock the agency use case — the highest-value customers who pay R$449/mês and manage multiple client sites.
 
 **Checklist:**
-- [ ] Agency plan ($99/month, 100 projects)
 - [ ] PDF report generation (@react-pdf/renderer)
-  - [ ] Branded PerfAlly header
   - [ ] Executive summary (score, grade, key findings)
   - [ ] Per-metric section with explanation + recommendations
   - [ ] Action plan table
-  - [ ] Historical chart (last 30 days) embedded as image
-- [ ] White-label PDF reports (Pro/Agency)
+- [ ] White-label PDF reports (Agency plan)
   - [ ] Custom logo upload (Vercel Blob)
   - [ ] Custom accent color
   - [ ] Custom footer text (agency name, contact info)
-- [ ] Multi-user (teams via Clerk Organizations)
+- [ ] Multi-user teams via Clerk Organizations
   - [ ] Invite team members
   - [ ] Role: Owner, Member
   - [ ] Billing tied to Organization, not individual
@@ -144,28 +146,17 @@ See [`phase-3-agency.md`](./phase-3-agency.md) for detailed steps.
 **Goal:** Grow via integrations, content, and product-led virality.
 
 **Checklist:**
+- [ ] `/check` public URL analyzer (top-of-funnel, no auth)
 - [ ] Slack alerts (in addition to email)
 - [ ] Webhook notifications (custom HTTP endpoint)
 - [ ] Public performance badge (embeddable `<img>` showing current score)
-  - [ ] `GET /api/badge/{projectId}` returns SVG
-  - [ ] Powers product virality — badge links back to PerfAlly
-- [ ] Competitor comparison
-  - [ ] Compare your site vs competitor URL side-by-side
-  - [ ] Available on Pro+
-- [x] AI-powered action plans (Claude API) → ✅ Promoted to Phase 2
-  - [x] Instead of static explanations, generate personalized recommendations
-  - [x] Context-aware: explain WHY the fix matters for their type of site
-  - [x] Prompt includes audit JSON + site URL + stack auto-detection
-- [ ] SEO score integration
-  - [ ] Lighthouse SEO audit scores (already in Lighthouse, just surface them)
-  - [ ] Combined "Site Health" score (performance + SEO + accessibility)
-- [ ] CrUX History API integration (25 weeks of field data)
-- [ ] "Performance Budget" feature
-  - [ ] Set target scores per project
-  - [ ] Alert if budget is exceeded after a deploy
-- [ ] Onboarding improvements
-  - [ ] Interactive first-run experience
-  - [ ] Demo project (pre-loaded with example data)
+- [ ] Competitor comparison (Pro+)
+- [ ] Refer-a-friend system
+- [x] AI-powered action plans → ✅ Promoted to Phase 2
+- [x] SEO + Accessibility score integration → ✅ Promoted to Phase 2
+- [x] CrUX History API (25 weeks) → ✅ Promoted to Phase 2
+- [ ] Performance Budget feature (set score targets per project, alert if exceeded)
+- [ ] Interactive onboarding + demo project
 
 **Deliverable:** Meaningful organic growth. Product advocates.
 
@@ -178,31 +169,12 @@ See [`phase-4-growth.md`](./phase-4-growth.md) for detailed steps.
 **Goal:** Build the ecosystem around PerfAlly. Developer-friendly features and platform integrations.
 
 **Checklist:**
-- [ ] Public REST API
-  - [ ] API key management in dashboard
-  - [ ] POST /v1/audits — trigger an audit
-  - [ ] GET /v1/audits/{id} — get result
-  - [ ] GET /v1/projects — list projects
-  - [ ] Documented with OpenAPI spec
-  - [ ] Rate-limited per plan
-- [ ] GitHub Action
-  - [ ] `perf-ally/audit-action`
-  - [ ] Runs audit on PR, posts comment with score diff
-  - [ ] Blocks merge if performance regresses beyond budget
-- [ ] WordPress plugin
-  - [ ] Auto-registers site on install
-  - [ ] Shows dashboard widget with current scores
+- [ ] Public REST API (API key management, POST /v1/audits, GET /v1/projects)
+- [ ] GitHub Action (`perf-ally/audit-action` — posts score diff on PR)
+- [ ] WordPress plugin (auto-register site, dashboard widget)
 - [ ] Zapier / Make integration
-  - [ ] Trigger: "Audit completed"
-  - [ ] Trigger: "Score degraded"
-  - [ ] Action: "Run audit"
-- [ ] Custom Lighthouse configuration
-  - [ ] Block third-party requests
-  - [ ] Custom throttling profiles
-  - [ ] Requires dedicated worker (Fly.io) — not PSI API
-- [ ] Multi-region scheduling
-  - [ ] Run audits from US, EU, APAC
-  - [ ] Show latency variance by region
+- [ ] Custom Lighthouse configuration (requires dedicated worker — Fly.io)
+- [ ] Multi-region scheduling (US, EU, APAC latency variance)
 
 **Deliverable:** Developer-friendly platform. Referrals from GitHub stars.
 
@@ -215,41 +187,31 @@ See [`phase-5-scale.md`](./phase-5-scale.md) for detailed steps.
 These are adjacent ideas worth evaluating once core revenue is stable:
 
 ### "One-time audit" product (Phase 3+)
-A $29 one-time purchase for a full report PDF with custom recommendations. No subscription. Targets consultants and freelancers who need a deliverable for a client. Zero account required.
+A R$49 one-time purchase for a full report PDF with custom AI recommendations. No subscription. Targets consultants who need a deliverable for a client.
 
 ### Performance regression as a service (Phase 5)
-"Did your last deploy break performance?" integrates with Vercel, Netlify, GitHub deploy hooks. When a new deploy happens, auto-trigger an audit and compare with previous. Email if regression > 10%.
-
-### Lighthouse as an API (Phase 5)
-White-label the audit engine. Charge per-call for developers who want Lighthouse results without running infra. Simple pricing: $0.01/audit. Targets agencies building their own tools.
+"Did your last deploy break performance?" Integrates with Vercel, Netlify, GitHub deploy hooks. When a new deploy happens, auto-trigger an audit and compare with previous.
 
 ### Managed CrUX insights newsletter (Phase 4)
-Weekly email: "Here's how your site changed vs last week." Personalized, automated, no dashboard needed. Converts free users who don't log in.
-
-### Vertical SaaS editions (Phase 5+)
-- PerfAlly for Shopify (connect store, auto-detect product/checkout pages)
-- PerfAlly for WordPress (plugin-based, auto-discover posts)
-- PerfAlly for Next.js (GitHub integration, per-route tracking)
+Weekly email: "Here's how your site changed vs last week." Personalized, automated. Converts free users who don't log in.
 
 ---
 
-## Pricing Evolution Path
+## Pricing
 
-**Start (Phase 1):**
-- Free: 1 project, manual only
+| DB key | Display name | Price | Projects | History |
+|--------|-------------|-------|----------|---------|
+| `free` | Grátis | R$0 | 1 | 7 days |
+| `starter` | Freelancer | R$89/mês | 5 | 30 days |
+| `pro` | Studio | R$199/mês | 20 | 90 days |
+| `agency` | Agência | R$449/mês | 100 | 1 year |
 
-**Phase 2:**
-- Free: 1 project, 10 runs/month
-- Starter R$99: 5 projects, daily monitoring, email alerts
-- Pro R$249: 20 projects, hourly monitoring, all alerts
+**Note:** DB enum values (`starter`, `pro`, `agency`) are fixed. Display names can change without migration.
 
-**Phase 3:**
-- Add Agência R$499: 100 projects, teams, PDF reports, white-label
-
-**Phase 4+:**
-- Consider annual pricing (2 months free = 17% discount)
-- Consider usage-based add-ons (extra projects, extra runs)
-- Consider LTD (lifetime deal) on AppSumo for growth spike
+**Future pricing levers:**
+- Annual pricing (2 months free = 17% discount)
+- Usage-based add-ons (extra projects)
+- LTD (lifetime deal) on AppSumo for growth spike
 
 ---
 
@@ -259,7 +221,7 @@ Weekly email: "Here's how your site changed vs last week." Personalized, automat
 |------|------------|
 | PSI API rate limits | Use API key, cache results, Upstash rate limiter |
 | CrUX data unavailable for small sites | Lab-only mode with clear UI explanation |
+| Chrome UX Report API not enabled | CrUX History feature silently degrades to null |
 | PSI API goes down | Retry with exponential backoff in QStash |
 | Lighthouse scores fluctuate between runs | Show moving average, document methodology |
-| Low CWV awareness in SMB market | Content marketing, education in onboarding |
 | Churn due to "set and forget" | Weekly digest email keeps users engaged |
