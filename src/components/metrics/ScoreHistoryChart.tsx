@@ -254,8 +254,13 @@ export function ScoreHistoryChart({ data, cruxHistory }: Props) {
                             <span className="sr-only">O que é P75?</span>
                           </button>
                         </TooltipTrigger>
-                        <TooltipContent side="top" className="max-w-xs text-xs">
-                          P75 (percentil 75) significa que 75% dos usuários reais tiveram um resultado igual ou melhor que este valor. É o padrão do Google para medir a experiência real dos visitantes.
+                        <TooltipContent side="top" className="max-w-xs text-xs space-y-1.5">
+                          <p>
+                            <strong>P75</strong> — 75% dos usuários reais tiveram um resultado igual ou melhor que este valor. É o padrão do Google para avaliar a experiência real dos visitantes.
+                          </p>
+                          <p className="text-muted-foreground">
+                            O Google atualiza esses dados a cada ~28 dias. Por isso, a linha de usuários reais pode parecer estável entre auditorias executadas no mesmo período — isso é esperado, não um erro.
+                          </p>
                         </TooltipContent>
                       </UITooltip>
                     </span>
