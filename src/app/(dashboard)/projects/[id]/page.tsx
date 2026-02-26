@@ -16,6 +16,7 @@ import { SEOAuditList } from "@/components/metrics/SEOAuditList"
 import { SiteHealthCard } from "@/components/metrics/SiteHealthCard"
 import { RunAuditButton } from "@/components/metrics/RunAuditButton"
 import { ChevronLeft, Share2, Globe } from "lucide-react"
+import { DownloadPDFButton } from "@/components/projects/DownloadPDFButton"
 import { ScoreHistoryChart } from "@/components/metrics/ScoreHistoryChart"
 import { ScheduleSelector } from "@/components/projects/ScheduleSelector"
 import { AlertThresholds } from "@/components/projects/AlertThresholds"
@@ -146,12 +147,18 @@ export default async function ProjectPage({
             lighthouseVersion={latestAudit.psiApiVersion}
             auditedAt={latestAudit.createdAt}
             shareSlot={
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/share/${latestAudit.shareToken}`} target="_blank">
-                  <Share2 className="mr-1.5 h-3.5 w-3.5" />
-                  Compartilhar
-                </Link>
-              </Button>
+              <div className="flex gap-2">
+                <DownloadPDFButton
+                  projectId={project.id}
+                  canGeneratePDF={planLimits.pdfReports}
+                />
+                <Button variant="outline" size="sm" asChild>
+                  <Link href={`/share/${latestAudit.shareToken}`} target="_blank">
+                    <Share2 className="mr-1.5 h-3.5 w-3.5" />
+                    Compartilhar
+                  </Link>
+                </Button>
+              </div>
             }
           />
 
