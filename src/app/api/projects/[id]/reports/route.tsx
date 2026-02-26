@@ -97,8 +97,10 @@ export async function POST(
   // No Blob token — stream PDF directly
   const safeName = project.name.replace(/[^a-z0-9]/gi, "-").toLowerCase()
   const now = new Date()
-  const datePart = now.toISOString().slice(0, 10) // YYYY-MM-DD
-  const hourPart = now.toISOString().slice(11, 13) + "h" + now.toISOString().slice(14, 16) // HHhMM
+  // Use local time for filename (America/Sao_Paulo)
+  const pad = (n: number) => n.toString().padStart(2, "0")
+  const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+  const hourPart = `${pad(now.getHours())}h${pad(now.getMinutes())}`
   const filename = `${safeName}-${datePart}-${hourPart}.pdf`
   return new Response(pdfBuffer, {
     headers: {

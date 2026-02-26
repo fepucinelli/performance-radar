@@ -405,83 +405,11 @@ function PageFooter({ agency }: { agency?: string | null }) {
   )
 }
 
-// ─── Page 1: Cover ───────────────────────────────────────────────────────────
+// ─── Page 1: Combined Cover + Executive Summary ──────────────────────────────
 
-function CoverPage({ project, audit, accent, branding }: {
-  project: ReportProps["project"]
-  audit: AuditData
-  accent: string
-  branding?: Branding | null
-}) {
+function CoverSummaryPage({ project, audit, branding, accent }: { project: ReportProps["project"]; audit: AuditData; branding?: Branding | null; accent: string }) {
   const health = siteHealth(audit.perfScore, audit.seoScore, audit.accessibilityScore)
   const healthGrade = gradeScore(health)
-
-  return (
-    <Page size="A4" style={styles.page}>
-      {/* Accent bar */}
-      <View style={[styles.coverAccentBar, { backgroundColor: accent }]} />
-
-      {/* Agency name */}
-      {branding?.agencyName && (
-        <Text style={{ fontSize: 11, color: "#6b7280", marginBottom: 32 }}>
-          {branding.agencyName}
-        </Text>
-      )}
-
-      {/* Report label */}
-      <Text style={{ fontSize: 11, color: "#6b7280", marginBottom: 8, fontFamily: "Helvetica-Bold" }}>
-        RELATÓRIO DE PERFORMANCE
-      </Text>
-
-      <Text style={styles.coverTitle}>{project.name}</Text>
-      <Link src={project.url} style={styles.coverUrl}>{project.url}</Link>
-
-      {/* Strategy + date */}
-      <View style={{ flexDirection: "row", gap: 16, marginBottom: 40 }}>
-        <Text style={{ fontSize: 9, color: "#9ca3af" }}>
-          {project.strategy === "mobile" ? "📱 Mobile" : "🖥️ Desktop"}
-        </Text>
-        <Text style={{ fontSize: 9, color: "#9ca3af" }}>
-          Auditado em {formatDate(audit.createdAt)}
-        </Text>
-      </View>
-
-      {/* Site Health score */}
-      <View style={{ alignItems: "flex-start" }}>
-        <View
-          style={[
-            styles.coverScoreCircle,
-            { backgroundColor: gradeColor(healthGrade) },
-          ]}
-        >
-          <Text style={styles.coverScoreNumber}>{health}</Text>
-        </View>
-        <Text style={styles.coverScoreLabel}>Saúde do Site</Text>
-        <View
-          style={[
-            styles.coverGradeBadge,
-            {
-              backgroundColor: gradeBg(healthGrade),
-              color: gradeColor(healthGrade),
-            },
-          ]}
-        >
-          <Text>{GRADE_LABELS[healthGrade].toUpperCase()}</Text>
-        </View>
-      </View>
-
-      {/* Footer */}
-      <View style={styles.coverFooter}>
-        <Text>{branding?.agencyContact ?? "perfally.com"}</Text>
-        <Text>Gerado por PerfAlly</Text>
-      </View>
-    </Page>
-  )
-}
-
-// ─── Page 2: Executive Summary ────────────────────────────────────────────────
-
-function ExecutiveSummaryPage({ audit, accent }: { audit: AuditData; accent: string }) {
   const metrics: { key: "lcp" | "cls" | "inp" | "fcp" | "ttfb"; lab: number | null; field: number | null }[] = [
     { key: "lcp", lab: audit.lcp, field: audit.cruxLcp },
     { key: "cls", lab: audit.cls, field: audit.cruxCls },
@@ -489,78 +417,73 @@ function ExecutiveSummaryPage({ audit, accent }: { audit: AuditData; accent: str
     { key: "fcp", lab: audit.fcp, field: audit.cruxFcp },
     { key: "ttfb", lab: audit.ttfb, field: null },
   ]
-
   const categoryScores = [
     { label: "Performance", value: audit.perfScore },
     { label: "SEO", value: audit.seoScore },
     { label: "Acessibilidade", value: audit.accessibilityScore },
     { label: "Boas Práticas", value: audit.bestPracticesScore },
   ]
-
   return (
     <Page size="A4" style={styles.page}>
       <View style={[styles.coverAccentBar, { backgroundColor: accent }]} />
-
-      <Text style={styles.sectionHeader}>Resumo Executivo</Text>
-
-      {/* 2×2 category grid */}
-      <View style={styles.row}>
-        {categoryScores.slice(0, 2).map((cat) => {
-          const score = cat.value ?? 0
-          const grade = gradeScore(score)
-          return (
-            <View key={cat.label} style={[styles.scoreCard, { backgroundColor: gradeBg(grade) }]}>
-              <Text style={[styles.scoreCardValue, { color: gradeColor(grade) }]}>{score}</Text>
-              <Text style={styles.scoreCardLabel}>{cat.label}</Text>
-              <View style={[styles.scoreCardGrade, { backgroundColor: gradeColor(grade), color: "#fff" }]}>
-                <Text>{GRADE_LABELS[grade]}</Text>
-              </View>
-            </View>
-          )
-        })}
+      {branding?.agencyName && (
+        <Text style={{ fontSize: 11, color: "#6b7280", marginBottom: 16 }}>{branding.agencyName}</Text>
+      )}
+      <Text style={{ fontSize: 11, color: "#6b7280", marginBottom: 8, fontFamily: "Helvetica-Bold" }}>RELATÓRIO DE PERFORMANCE</Text>
+      <Text style={styles.coverTitle}>{project.name}</Text>
+      <Link src={project.url} style={styles.coverUrl}>{project.url}</Link>
+      <View style={{ flexDirection: "row", gap: 16, marginBottom: 24 }}>
+        <Text style={{ fontSize: 9, color: "#9ca3af" }}>{project.strategy === "mobile" ? "📱 Mobile" : "🖥️ Desktop"}</Text>
+        <Text style={{ fontSize: 9, color: "#9ca3af" }}>Auditado em {formatDate(audit.createdAt)}</Text>
       </View>
-      <View style={styles.row}>
-        {categoryScores.slice(2).map((cat) => {
-          const score = cat.value ?? 0
-          const grade = gradeScore(score)
-          return (
-            <View key={cat.label} style={[styles.scoreCard, { backgroundColor: gradeBg(grade) }]}>
-              <Text style={[styles.scoreCardValue, { color: gradeColor(grade) }]}>{score}</Text>
-              <Text style={styles.scoreCardLabel}>{cat.label}</Text>
-              <View style={[styles.scoreCardGrade, { backgroundColor: gradeColor(grade), color: "#fff" }]}>
-                <Text>{GRADE_LABELS[grade]}</Text>
-              </View>
-            </View>
-          )
-        })}
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24 }}>
+        <View style={{ alignItems: "center", marginRight: 32 }}>
+          <View style={[styles.coverScoreCircle, { backgroundColor: gradeColor(healthGrade) }]}> <Text style={styles.coverScoreNumber}>{health}</Text> </View>
+          <Text style={styles.coverScoreLabel}>Saúde do Site</Text>
+          <View style={[styles.coverGradeBadge, { backgroundColor: gradeBg(healthGrade), color: gradeColor(healthGrade) }]}> <Text>{GRADE_LABELS[healthGrade].toUpperCase()}</Text> </View>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.sectionHeader}>Resumo Executivo</Text>
+          <View style={styles.row}>
+            {categoryScores.slice(0, 2).map((cat) => {
+              const score = cat.value ?? 0
+              const grade = gradeScore(score)
+              return (
+                <View key={cat.label} style={[styles.scoreCard, { backgroundColor: gradeBg(grade) }]}> <Text style={[styles.scoreCardValue, { color: gradeColor(grade) }]}>{score}</Text> <Text style={styles.scoreCardLabel}>{cat.label}</Text> <View style={[styles.scoreCardGrade, { backgroundColor: gradeColor(grade), color: "#fff" }]}> <Text>{GRADE_LABELS[grade]}</Text> </View> </View>
+              )
+            })}
+          </View>
+          <View style={styles.row}>
+            {categoryScores.slice(2).map((cat) => {
+              const score = cat.value ?? 0
+              const grade = gradeScore(score)
+              return (
+                <View key={cat.label} style={[styles.scoreCard, { backgroundColor: gradeBg(grade) }]}> <Text style={[styles.scoreCardValue, { color: gradeColor(grade) }]}>{score}</Text> <Text style={styles.scoreCardLabel}>{cat.label}</Text> <View style={[styles.scoreCardGrade, { backgroundColor: gradeColor(grade), color: "#fff" }]}> <Text>{GRADE_LABELS[grade]}</Text> </View> </View>
+              )
+            })}
+          </View>
+        </View>
       </View>
-
-      {/* CWV at a glance */}
-      <Text style={[styles.sectionHeader, { marginTop: 16, fontSize: 11 }]}>
-        Core Web Vitals
-      </Text>
+      <Text style={[styles.sectionHeader, { marginTop: 0, fontSize: 11 }]}>Core Web Vitals</Text>
       {metrics.map(({ key, lab, field }) => {
         const exp = METRIC_EXPLANATIONS[key]
         const value = field ?? lab
         const grade = value !== null ? gradeMetric(key, value) : "needs-improvement"
         return (
           <View key={key} style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 6, alignItems: "center" }}>
-            <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", flex: 1 }}>
-              {exp.shortName}
-            </Text>
+            <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", flex: 1 }}>{exp.shortName}</Text>
             <Text style={{ fontSize: 9, color: "#6b7280", flex: 2 }}>{exp.name}</Text>
-            <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", width: 60, textAlign: "right", color: gradeColor(grade) }}>
-              {value !== null ? formatMetricValue(key, value) : "—"}
-            </Text>
+            <Text style={{ fontSize: 10, fontFamily: "Helvetica-Bold", width: 60, textAlign: "right", color: gradeColor(grade) }}>{value !== null ? formatMetricValue(key, value) : "—"}</Text>
             <View style={{ width: 50, alignItems: "flex-end" }}>
-              <View style={[styles.metricGradeBadge, { backgroundColor: gradeBg(grade), color: gradeColor(grade) }]}>
-                <Text>{GRADE_LABELS[grade]}</Text>
-              </View>
+              <View style={[styles.metricGradeBadge, { backgroundColor: gradeBg(grade), color: gradeColor(grade) }]}> <Text>{GRADE_LABELS[grade]}</Text> </View>
             </View>
           </View>
         )
       })}
-
+      <View style={styles.coverFooter}>
+        <Text>{branding?.agencyContact ?? "perfally.com"}</Text>
+        <Text>Gerado por PerfAlly</Text>
+      </View>
       <PageFooter />
     </Page>
   )
@@ -790,15 +713,13 @@ function SEOPage({ audit, accent }: { audit: AuditData; accent: string }) {
 
 export function AuditReportPDF({ project, audit, branding }: ReportProps) {
   const accent = branding?.accentColor ?? "#2563eb"
-
   return (
     <Document
       title={`Relatório de Performance — ${project.name}`}
       author={branding?.agencyName ?? "PerfAlly"}
       subject="Relatório de Core Web Vitals"
     >
-      <CoverPage project={project} audit={audit} accent={accent} branding={branding} />
-      <ExecutiveSummaryPage audit={audit} accent={accent} />
+      <CoverSummaryPage project={project} audit={audit} branding={branding} accent={accent} />
       <MetricsPage audit={audit} accent={accent} />
       <ActionPlanPage audit={audit} accent={accent} />
       <SEOPage audit={audit} accent={accent} />
