@@ -97,36 +97,7 @@ Connect with Vercel, Netlify, Render, Fly.io — auto-trigger audits on deploy:
 3. We extract the deploy URL, run audit, store as `triggered_by: "deploy"`
 4. Email if regression detected
 
-### 4. WordPress Plugin
-
-Target: WordPress powers 43% of the web. Large SMB market.
-
-**Plugin features:**
-- Install plugin → auto-registers site (opens OAuth-like flow)
-- WordPress admin widget: current performance score
-- WooCommerce-aware: monitors checkout page specifically
-- "Run audit" button in WP admin
-
-**Tech:** WordPress plugin (PHP). Build this after the API is stable. Treat it as a separate product/repo.
-
-**Monetization angle:** Plugin converts free users to paid (they install plugin, see scores, subscribe in WP admin).
-
-### 5. Zapier / Make Integration
-
-Register as a Zapier app:
-- **Trigger:** "New audit completed"
-- **Trigger:** "Alert fired (metric degraded)"
-- **Action:** "Run audit on URL"
-
-Connect with popular SMB tools:
-- Slack (send message when score improves/degrades)
-- Google Sheets (log scores weekly)
-- Notion (create performance report page)
-- Airtable (log audits to base)
-
-Zapier public apps require review. Start with Make (formerly Integromat) — easier to get listed.
-
-### 6. Custom Lighthouse Worker
+### 4. Custom Lighthouse Worker
 
 The PSI API has limitations:
 - Can't test authenticated pages (login-walled content)
@@ -166,7 +137,7 @@ This is the path to:
 - CI/CD integration with real Lighthouse (not PSI)
 - Multi-step flows (login → checkout page)
 
-### 7. Performance Regression Monitoring
+### 5. Performance Regression Monitoring
 
 Dedicated feature for dev teams (different from SMB use case):
 
@@ -181,7 +152,7 @@ Enable: "Monitor after every deploy"
 
 This is Phase 5 because it requires the GitHub integration + custom Lighthouse worker.
 
-### 8. Multi-Region Auditing
+### 6. Multi-Region Auditing
 
 Run the same URL from multiple locations and compare:
 
@@ -205,24 +176,3 @@ API access is available on Pro+ plan (included in subscription). Consider:
 - **Overage:** $0.05/call above limit
 - Or: separate "API add-on" $10/month for unlimited API calls
 
----
-
-## Platform / Marketplace Vision
-
-Long-term (12–18 months), PerfAlly becomes a platform:
-
-1. **Plugin ecosystem:** Third-party integrations (Shopify app, WooCommerce extension, Webflow plugin)
-2. **Audit templates:** Pre-configured audit profiles for e-commerce, SaaS, blogs
-3. **Reseller program:** Agencies resell PerfAlly under their brand (already enabled by white-label)
-4. **Data insights:** Aggregated, anonymized benchmarks by industry ("How does your e-commerce site compare to others?")
-
----
-
-## Definition of Done (pick your Phase 5 ship)
-
-Choose one integration to ship first based on your user base:
-
-**If users are developers:** Ship GitHub Action first
-**If users are agencies:** Ship Zapier first
-**If users are WordPress site owners:** Ship WordPress plugin first
-**If you want B2B sales:** Ship public API + OpenAPI docs first

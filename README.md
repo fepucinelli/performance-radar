@@ -1,478 +1,296 @@
 # PerfAlly
 
-> **AI-powered performance metrics platform** | Real-time Core Web Vitals tracking with Claude-generated insights
+> **Auditorias profissionais de performance e SEO para desenvolvedores que vendem consultoria.**
+> Monitore os sites dos seus clientes. Gere relatórios impressionantes. Cobre como especialista.
 
-[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=flat-square&logo=next.js)](https://nextjs.org)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-blue?style=flat-square&logo=postgresql)](https://www.postgresql.org)
-[![Stripe](https://img.shields.io/badge/Stripe-Ready-purple?style=flat-square&logo=stripe)](https://stripe.com)
-[![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
-
----
-
-## 📌 Overview
-
-PerfAlly is a **SaaS performance analytics platform** that helps developers and teams monitor, understand, and optimize their web application's performance. Using AI-powered explanations powered by Claude, PerfAlly transforms raw Core Web Vitals data into actionable insights.
-
-### What's Live (Phase 1 ✅ + Phase 2 🚀)
-- ✅ Real-time Core Web Vitals tracking (LCP, FID, CLS)
-- ✅ Multi-project dashboard with historical analytics
-- ✅ AI-powered performance explanations (Claude integration)
-- ✅ User authentication & authorization
-- ✅ Free tier with essential analytics
-- 🚀 **Pro tier** with advanced features (Phase 2)
-- 🚀 **Agency tier** with team collaboration (Phase 2)
-- 🚀 Stripe billing & subscription management
-- 🚀 Usage tracking & quota management
-
-**Current Status:** End of Phase 2 — Production ready with billing system
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
+[![Neon](https://img.shields.io/badge/Neon-PostgreSQL-green?style=flat-square)](https://neon.tech)
+[![Vercel](https://img.shields.io/badge/Deployed-Vercel-black?style=flat-square&logo=vercel)](https://vercel.com)
 
 ---
 
-## 🎯 Key Features
+## What It Does
 
-### For Everyone (Free Tier)
-- 📊 Dashboard with real-time metrics
-- 📈 7-day historical data retention
-- 🔍 Basic performance insights
-- 1 project maximum
-- 5,000 metrics/month
+PerfAlly runs PageSpeed Insights audits on your clients' sites and turns raw Lighthouse data into something you can actually deliver to a client — a Site Health score, failing SEO/accessibility items labeled in plain Portuguese, AI-generated action plans, and 25 weeks of real-user trend data.
 
-### Pro Users
-- 📅 90-day historical data retention
-- 🤖 AI-powered detailed explanations
-- 📧 Weekly performance reports
-- ⚙️ Custom metric tracking
-- Unlimited projects
-- 50,000 metrics/month
-
-### Agency Users
-- 🏢 Team collaboration & invites
-- 📊 White-label dashboards
-- 🔌 Advanced API access
-- 📱 Mobile app support
-- Priority support
-- Unlimited everything
+You pay R$89–449/mês. You bill your clients R$300–1.000/mês for monitoring. The margin is the product.
 
 ---
 
-## 🏗️ Architecture
+## Current Status
 
-### Tech Stack
-- **Frontend:** React 18 + Next.js 14 (App Router)
-- **Backend:** Server Actions + Node.js
-- **Database:** PostgreSQL 15
-- **AI Integration:** Claude API (Haiku & higher)
-- **Payments:** Stripe
-- **Styling:** TailwindCSS 3
-- **Type Safety:** TypeScript 5
-- **Hosting:** Vercel (recommended)
+**Phase 0 + Phase 1 + Phase 2 complete.**
 
-### System Design
+| Phase | What | Status |
+|-------|------|--------|
+| 0 — Foundation | Auth, DB, Vercel deploy, CI | ✅ Done |
+| 1 — MVP | URL → audit → report, free tier | ✅ Done |
+| 2 — Pro | Stripe billing, scheduled monitoring, email alerts, history charts, AI action plans, SEO/A11y audits, CrUX 25-week data | ✅ Done (needs env vars in prod) |
+| 3 — Agency | PDF reports, white-label, multi-user teams | Planned |
+| 4 — Growth | `/check` public analyzer, Slack alerts, embeddable badge | Planned |
+
+---
+
+## Features
+
+### Free (R$0)
+- 1 project, 5 manual audits/month
+- Site Health score (perf + SEO + accessibility composite)
+- Core Web Vitals: LCP, INP, CLS, FCP, TTFB with field data (CrUX P75)
+- SEO + Accessibility failing items with PT-BR labels
+- Static action plan
+- Public share link (`/share/[token]`)
+- 7-day history
+
+### Freelancer (R$89/mês)
+- 5 projects
+- Daily scheduled monitoring
+- Email alerts when metrics degrade (configurable per-metric thresholds)
+- AI-powered action plans (5/month) — stack-aware, PT-BR
+- 30-day history
+
+### Studio (R$199/mês)
+- 20 projects
+- Hourly scheduled monitoring
+- 30 AI action plans/month
+- 90-day history
+- Slack alerts (coming Phase 4)
+
+### Agência (R$449/mês)
+- 100 projects
+- Unlimited AI action plans
+- 1-year history
+- PDF reports + white-label branding (Phase 3)
+- Multi-user teams via Clerk Organizations (Phase 3)
+
+---
+
+## Tech Stack
+
+| Layer | Choice | Why |
+|-------|--------|-----|
+| Framework | Next.js 16.1.6 + React 19, App Router | App Router for server components + Server Actions |
+| Styling | Tailwind CSS v4 + shadcn/ui (new-york) | CSS-based config (`@import "tailwindcss"`) |
+| Database | Neon (serverless PostgreSQL) + Drizzle ORM | Auto-suspend, Vercel native integration, DB branching |
+| Auth | Clerk v6 | Built-in orgs for Phase 3 teams, webhook sync |
+| Payments | Stripe | Subscriptions + Customer Portal |
+| Email | Resend + React Email | Alert emails, digest emails |
+| Jobs | Upstash QStash + Vercel Cron | Fan-out scheduled audit jobs |
+| Cache | Upstash Redis | Rate limiting, dedup |
+| Storage | Vercel Blob | PDF reports, logos (Phase 3) |
+| AI | Claude Haiku (`claude-haiku-4-5-20251001`) | Action plan generation — ~R$0.005/call |
+| Charts | Recharts | Score history + CrUX 25-week view |
+| Data | PageSpeed Insights API v5 + CrUX History API | Lighthouse lab data + real-user field data in one call |
+| Monitoring | Sentry | Error tracking |
+| Deployment | Vercel | Serverless, cron, blob storage |
+
+---
+
+## Project Structure
 
 ```
-┌─────────────────────────────────────────────────┐
-│           User Browser / Mobile                 │
-└────────────────┬────────────────────────────────┘
-                 │
-        ┌────────▼────────┐
-        │   Next.js 14    │
-        │  (App Router)   │
-        └────────┬────────┘
-                 │
-    ┌────────────┼────────────┐
-    │            │            │
-┌───▼───┐  ┌────▼─────┐  ┌───▼────┐
-│Server │  │  Claude  │  │ Stripe │
-│Actions│  │  API     │  │ API    │
-└───┬───┘  └────┬─────┘  └───┬────┘
-    │           │            │
-    └───────────┼────────────┘
-                │
-        ┌───────▼────────┐
-        │  PostgreSQL    │
-        │  Database      │
-        └────────────────┘
+src/
+├── app/
+│   ├── (auth)/                    # Sign-in / sign-up pages (Clerk)
+│   ├── (dashboard)/               # Protected app routes
+│   │   ├── dashboard/             # Project list
+│   │   ├── projects/[id]/         # Project detail + audit history
+│   │   └── settings/              # Billing, alert thresholds
+│   ├── (marketing)/               # Landing page (/)
+│   ├── share/[token]/             # Public read-only audit report
+│   └── api/
+│       ├── webhooks/stripe/       # Subscription lifecycle
+│       ├── webhooks/clerk/        # User sync to DB
+│       ├── projects/[id]/audit/   # Manual audit trigger
+│       ├── cron/trigger-audits/   # Vercel Cron → QStash fan-out
+│       └── jobs/run-audit/        # QStash job handler
+├── components/
+│   ├── metrics/
+│   │   ├── SiteHealthCard.tsx     # 2×2 composite score grid (header)
+│   │   ├── MetricCard.tsx         # Individual CWV card (lab + field)
+│   │   ├── ScoreGauge.tsx         # Circular SVG gauge 0–100
+│   │   ├── ActionPlan.tsx         # AI + static action plan display
+│   │   ├── AuditList.tsx          # Collapsible full Lighthouse audit list
+│   │   ├── SEOAuditList.tsx       # Failing SEO + a11y items (PT-BR)
+│   │   ├── ScoreHistoryChart.tsx  # Line chart + CrUX 25-week toggle
+│   │   └── RunAuditButton.tsx     # Button with free-tier run counter
+│   └── projects/
+│       └── AlertThresholds.tsx    # Per-project alert config
+├── lib/
+│   ├── api/
+│   │   ├── pagespeed.ts           # PSI API client (all 4 Lighthouse categories)
+│   │   └── crux-history.ts        # CrUX History API (25-week P75)
+│   ├── ai/
+│   │   └── action-plan.ts         # Claude Haiku action plan generation
+│   ├── db/
+│   │   ├── index.ts               # Drizzle + Neon client
+│   │   └── schema.ts              # Single source of truth for all tables
+│   ├── utils/
+│   │   ├── metrics.ts             # CWV thresholds, gradeMetric, GRADE_STYLES
+│   │   ├── plan-limits.ts         # PLAN_LIMITS per tier
+│   │   ├── explanations.ts        # Static action plan fallback
+│   │   └── schedule.ts            # nextNoonBRT, tomorrowNoonBRT
+│   ├── alerts.ts                  # checkAndFireAlerts (Resend)
+│   ├── audit-runner.ts            # runAuditForProject (shared between manual + cron)
+│   └── stripe.ts                  # Stripe client
+├── actions/
+│   ├── projects.ts                # createProjectAction, deleteProjectAction
+│   ├── billing.ts                 # createCheckoutSession, createBillingPortalSession
+│   └── alerts.ts                  # updateAlertThresholdsAction
+├── emails/
+│   └── alert-email.tsx            # React Email alert template
+├── types/
+│   └── index.ts                   # PSIAuditData, LighthouseResult, AIActionItem, etc.
+├── env.ts                         # Typed env validation (@t3-oss/env-nextjs + zod)
+└── proxy.ts                       # Clerk middleware (Next.js 16: proxy.ts, not middleware.ts)
 ```
-
-**Core Principles:**
-1. **Server-First Architecture** – Prefer Server Actions over API routes (security, performance)
-2. **Type Safety** – Strict TypeScript with no `any` types
-3. **Performance** – Indexed queries, pagination, caching strategies
-4. **Scalability** – Designed for Phase 3 (Agency) expansion
-
-For detailed architecture, see [Architecture Guide](./docs/architecture.md)
 
 ---
 
-## 🚀 Quick Start
+## Local Development
 
 ### Prerequisites
-- **Node.js** 18+ & pnpm
-- **PostgreSQL** 15+ (local or Docker)
-- **Stripe account** (for billing features)
-- **Claude API key** (for AI explanations)
 
-### Local Development Setup
+- Node.js 20+ and pnpm
+- Accounts: [Neon](https://neon.tech), [Clerk](https://clerk.com), [Google Cloud](https://console.cloud.google.com) (for PSI API key)
 
-#### 1. Clone & Install
+### 1. Clone & Install
+
 ```bash
-git clone https://github.com/felipepucinelli/perf-ally.git
+git clone https://github.com/fepucinelli/perf-ally.git
 cd perf-ally
 pnpm install
 ```
 
-#### 2. Environment Variables
+### 2. Environment Variables
+
 ```bash
 cp .env.example .env.local
 ```
 
-Required variables:
+Minimum required to run locally:
+
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/perf_ally"
+# Database (Neon)
+DATABASE_URL=postgresql://...
 
-# Authentication (NextAuth or your auth provider)
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="http://localhost:3000"
+# Auth (Clerk)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+CLERK_SECRET_KEY=sk_test_...
+CLERK_WEBHOOK_SECRET=whsec_...
 
-# Claude AI
-CLAUDE_API_KEY="sk-ant-..."
+# Google PSI + CrUX APIs
+GOOGLE_API_KEY=AIza...
 
-# Stripe
-STRIPE_SECRET_KEY="sk_test_..."
-STRIPE_PUBLISHABLE_KEY="pk_test_..."
-STRIPE_WEBHOOK_SECRET="whsec_test_..."
+# AI (optional — falls back to static plan if missing)
+ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-#### 3. Database Setup
+Phase 2 features (Stripe, email alerts) also need:
+```env
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_STARTER_PRICE_ID=price_...   # Freelancer R$89
+STRIPE_PRO_PRICE_ID=price_...       # Studio R$199
+STRIPE_AGENCY_PRICE_ID=price_...    # Agência R$449
+RESEND_API_KEY=re_...
+```
+
+### 3. Database Setup
+
 ```bash
-# Run migrations
-pnpm db:migrate
+# Push schema to your Neon database
+pnpm exec drizzle-kit push --force
 
-# Seed development data (optional)
-pnpm db:seed
-
-# Open Prisma Studio to inspect data
+# Inspect data visually
 pnpm db:studio
 ```
 
-#### 4. Local Stripe Webhook
-```bash
-# Install Stripe CLI from https://stripe.com/docs/stripe-cli
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
+> **Note:** `pnpm db:push` may fail due to double-dash arg parsing — use `pnpm exec drizzle-kit push --force` directly.
 
-# Copy webhook signing secret to .env.local
-STRIPE_WEBHOOK_SECRET="whsec_..."
-```
+### 4. Start Dev Server
 
-#### 5. Start Development Server
 ```bash
 pnpm dev
 ```
 
-Visit `http://localhost:3000` 🎉
+Visit `http://localhost:3000`.
+
+Sign up → create a project → run audit → see the full report.
+
+### 5. Local Stripe Webhooks (optional)
+
+```bash
+stripe listen --forward-to localhost:3000/api/webhooks/stripe
+# Copy the whsec_... to STRIPE_WEBHOOK_SECRET in .env.local
+```
 
 ### Common Commands
-```bash
-pnpm dev              # Start dev server
-pnpm build            # Build for production
-pnpm test             # Run tests
-pnpm test:watch      # Watch mode
-pnpm lint             # Check code quality
-pnpm db:migrate      # Apply migrations
-pnpm db:studio       # Open database explorer
-```
-
----
-
-## 🌐 Deployment
-
-### Deploy to Vercel (Recommended)
 
 ```bash
-# Install Vercel CLI
-pnpm add -g vercel
-
-# Deploy
-vercel
-
-# Set production environment variables in Vercel dashboard
-```
-
-**Environment Variables to Configure:**
-- `DATABASE_URL` → PostgreSQL connection string
-- `NEXTAUTH_SECRET` → New secret for production
-- `NEXTAUTH_URL` → Your production domain
-- `CLAUDE_API_KEY` → API key with production limits
-- `STRIPE_SECRET_KEY` → Production Stripe key
-- `STRIPE_WEBHOOK_SECRET` → Production webhook secret
-
-### Self-Hosted Deployment
-
-#### Using Docker
-```bash
-# Build image
-docker build -t perf-ally .
-
-# Run container
-docker run -p 3000:3000 \
-  -e DATABASE_URL="postgresql://..." \
-  -e CLAUDE_API_KEY="sk-ant-..." \
-  perf-ally
-```
-
-#### Using PM2
-```bash
-# Install PM2
-npm install -g pm2
-
-# Build and start
-pnpm build
-pm2 start "pnpm start" --name "perf-ally"
-
-# Monitor
-pm2 monitor
-```
-
-#### Database Deployment
-```bash
-# PostgreSQL on managed service (recommended)
-# - AWS RDS
-# - Digital Ocean
-# - Railway
-# - PlanetScale
-
-# Run migrations on production database
-DATABASE_URL="postgresql://prod-user:pwd@host:5432/db" pnpm db:migrate
+pnpm dev                              # Start dev server
+pnpm build                            # Production build
+pnpm lint                             # ESLint
+pnpm exec tsc --noEmit               # Type check
+pnpm exec drizzle-kit push --force   # Push schema changes to DB
+pnpm db:studio                        # Drizzle Studio (DB explorer)
 ```
 
 ---
 
-## 📊 Feature Comparison
+## How Audits Work
 
-| Feature | Free | Pro | Agency |
-|---------|------|-----|--------|
-| Projects | 1 | Unlimited | Unlimited |
-| Data Retention | 7 days | 90 days | 365 days |
-| Metrics/Month | 5,000 | 50,000 | Unlimited |
-| AI Explanations | ❌ | ✅ | ✅ |
-| Weekly Reports | ❌ | ✅ | ✅ |
-| Custom Metrics | ❌ | ✅ | ✅ |
-| Team Members | 1 | 1 | Unlimited |
-| API Access | Limited | Full | Full |
-| Priority Support | ❌ | ❌ | ✅ |
-| White-Label | ❌ | ❌ | ✅ |
-| SLA | — | — | 99.9% |
-
----
-
-## 📚 Documentation
-
-- **[Architecture Guide](./docs/architecture.md)** – System design & decision rationale
-- **[Database Schema](./docs/database-schema.md)** – All tables, relationships, indexes
-- **[Phase 2 Roadmap](./docs/phase-2-pro.md)** – Current feature set & implementation status
-- **[Phase 3 Roadmap](./docs/phase-3-agency.md)** – Upcoming Agency features
-- **[Stripe Integration](./docs/stripe-integration.md)** – Billing system & webhook setup
-- **[Claude Development Guide](./claude.md)** – For contributors & AI assistance
-
----
-
-## 👨‍💻 Development Guide
-
-### For Contributors
-
-**Before contributing, review:**
-1. [claude.md](./claude.md) – Development patterns & conventions
-2. [CONTRIBUTING.md](./CONTRIBUTING.md) – PR checklist & standards
-
-**Key Conventions:**
-- ✅ Use **Server Actions** for database queries (not API routes)
-- ✅ Keep **types in `/src/types/index.ts`** (single source of truth)
-- ✅ **Paginate queries** with `take: 50` + offset
-- ✅ **No `any` types** – use TypeScript strictly
-- ✅ Add **indexes** for frequently queried columns
-
-**Feature Implementation Checklist:**
-- [ ] Database schema updated + migration created
-- [ ] Server Action created in `/src/lib/actions/`
-- [ ] Types added to `/src/types/index.ts`
-- [ ] UI component built in `/src/components/`
-- [ ] Tests added (at least 1 happy-path test)
-- [ ] Stripe integration (if billing-related)
-- [ ] Update relevant `/docs/` files
-
-### Project Structure
 ```
-perf-ally/
-├── src/
-│   ├── app/                    # Next.js 14 App Router
-│   │   ├── (auth)/            # Auth routes
-│   │   ├── dashboard/         # Main dashboard
-│   │   ├── settings/          # User settings & billing
-│   │   └── api/               # Strategic API routes (webhooks only)
-│   ├── components/            # Reusable React components
-│   ├── lib/
-│   │   ├── actions/           # Server Actions (⭐ prefer these)
-│   │   ├── db.ts              # Database client
-│   │   ├── stripe.ts          # Stripe utilities
-│   │   ├── explanations.ts    # Claude integration
-│   │   └── utils/             # Helper functions
-│   ├── types/
-│   │   └── index.ts           # All TypeScript types
-│   ├── hooks/                 # Custom React hooks
-│   └── styles/                # Global styles
-├── prisma/
-│   └── schema.prisma          # Database schema
-├── docs/                      # Documentation
-├── public/                    # Static assets
-├── .claudeignore              # Claude context optimization
-├── claude.md                  # Development guide for Claude AI
-└── README.md                  # This file
+User clicks "Run Audit"
+  → POST /api/projects/[id]/audit
+    → PSI API call (all 4 Lighthouse categories: performance, seo, accessibility, best-practices)
+    → DB insert (perf scores + SEO/a11y scores + lighthouse JSON + CrUX P75 field data)
+    → Check alert thresholds → send email if exceeded (Resend)
+    → Fire-and-forget: fetch CrUX History (25 weeks) → update row
+    → Fire-and-forget: generate AI action plan (Claude Haiku) → update row
+
+Vercel Cron (hourly)
+  → POST /api/cron/trigger-audits
+    → find projects where nextAuditAt ≤ now
+    → enqueue one QStash job per project
+      → POST /api/jobs/run-audit?projectId=xxx
+        → same runAuditForProject() as manual flow
 ```
 
 ---
 
-## 🤖 AI Integration (Claude)
+## Key Gotchas
 
-PerfAlly uses **Claude 3.5 Haiku** & **Claude 3 Opus** for AI explanations:
-
-### How Explanations Work
-1. User requests explanation for metrics
-2. **Server Action** fetches minimal metric data (indexed query)
-3. **Claude API** generates insights (streamed response)
-4. Response cached in database for 24 hours
-5. Cached explanation served to subsequent requests
-
-### Smart Caching
-- Same metrics → reuse cached explanation (24h TTL)
-- Different metrics → generate new explanation
-- Cache invalidated on significant metric changes
-
-### Token Optimization
-- Use Haiku for summaries & quick insights
-- Use Opus only for complex analysis
-- Batch requests to minimize API calls
-- Cache aggressively
+- **`proxy.ts` not `middleware.ts`** — Next.js 16 Clerk middleware lives in `src/proxy.ts`
+- **`timestamptz` not exported** — Drizzle ORM v0.45 doesn't export it; use `const timestamptz = (name: string) => timestamp(name, { withTimezone: true })`
+- **drizzle-kit doesn't load `.env.local`** — `drizzle.config.ts` calls `config({ path: ".env.local" })` from dotenv manually
+- **PSI multiple categories** — URLSearchParams can't duplicate keys via spread; use multiple `.append("category", ...)` calls
+- **CrUX CLS is ×100** — `CUMULATIVE_LAYOUT_SHIFT_SCORE` from CrUX is stored as e.g. `10` meaning `0.10`; divide by 100
+- **INP lab data is always null** — Lighthouse can't measure INP; use `cruxInp` (CrUX P75) as the only source
+- **`noUncheckedIndexedAccess: true`** — `array[0]` returns `T | undefined`; use optional chaining throughout
+- **Tailwind v4** — CSS-based config (`@import "tailwindcss"` in globals.css); no `tailwind.config.ts`
+- **Dashboard pages need `force-dynamic`** — `export const dynamic = "force-dynamic"` on every page that reads Clerk session
 
 ---
 
-## 💳 Stripe Integration
+## Deployment
 
-### Subscription Tiers
-- **Free** → $0/month | API key required
-- **Pro** → $29/month | AI insights + reports
-- **Agency** → $199/month | Team features + white-label
+Deployed to Vercel. Connect Neon via the Vercel Neon integration for automatic `DATABASE_URL` per environment (production + preview branches).
 
-### Webhook Events Handled
-- `customer.subscription.created` – Upgrade user tier
-- `customer.subscription.deleted` – Downgrade to free
-- `invoice.payment_succeeded` – Log payment
-- `invoice.finalized` – Send receipt email
-
-### Testing Locally
-```bash
-# Terminal 1: Start dev server
-pnpm dev
-
-# Terminal 2: Forward Stripe webhooks
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
-
-# Use test card in checkout: 4242 4242 4242 4242
-```
-
-See [Stripe Integration Guide](./docs/stripe-integration.md) for complete setup.
+Set all env vars in the Vercel dashboard. Wire:
+1. **Clerk webhook** → `https://your-domain.com/api/webhooks/clerk` (events: `user.created`, `user.deleted`)
+2. **Stripe webhook** → `https://your-domain.com/api/webhooks/stripe` (events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`)
+3. **CrUX History API** → enable "Chrome UX Report API" in Google Cloud Console (same API key as PSI)
 
 ---
 
-## 📈 Performance Metrics
+## Docs
 
-**Target Performance (Phase 2):**
-- Dashboard load time: < 2s (Core Web Vitals optimized)
-- API response time: < 500ms (p95)
-- Database query time: < 100ms (with indexes)
-- Cache hit rate: > 80% (for explanations)
-
-**Monitoring:**
-- Vercel Analytics for Web Vitals
-- Custom monitoring dashboards
-- Database query performance logs
-
----
-
-## 🐛 Troubleshooting
-
-### Database Connection Issues
-```bash
-# Verify PostgreSQL is running
-psql -U postgres -d perf_ally -c "SELECT 1"
-
-# Check DATABASE_URL format
-# postgresql://user:password@localhost:5432/db_name
-
-# Reset migrations
-pnpm db:reset  # ⚠️ Wipes database
-```
-
-### Stripe Webhook Not Triggering
-```bash
-# Verify webhook endpoint is correct
-# Should be: http://localhost:3000/api/webhooks/stripe
-
-# Check Stripe Dashboard > Webhooks > Events
-# Look for delivery attempts & error logs
-
-# Restart Stripe CLI listener
-stripe listen --forward-to localhost:3000/api/webhooks/stripe
-```
-
-### Claude API Rate Limiting
-- Free tier: 5 requests/minute
-- Check rate limit headers in response
-- Implement exponential backoff for retries
-- Cache explanations to reduce API calls
-
-### Out of Memory During Build
-```bash
-# Increase Node memory for production builds
-NODE_OPTIONS=--max_old_space_size=4096 pnpm build
-```
-
----
-
-## 📋 Roadmap
-
-### ✅ Phase 1 (Complete)
-- Core dashboard & metrics display
-- User authentication
-- Free tier functionality
-- Stripe billing system
-- Basic explanations (simple heuristics)
-
-### 🚀 Phase 2 (In Progress → Launch Ready)
-- AI-powered explanations (Claude integration)
-- Pro & Agency subscription tiers
-- Usage tracking & quotas
-- Weekly digest emails
-- Team invitations (Agency)
-
-### 📅 Phase 3 (Planned)
-- White-label dashboards (Agency)
-- Advanced API endpoints
-- Custom alert rules
-- Slack/Teams integrations
-- Performance benchmarking
-- Budget alerts
-
-See [Phase Roadmaps](./docs/) for detailed breakdowns.
-
----
-
-## 📄 License
-
-This project is licensed under the **MIT License** – see [LICENSE](./LICENSE) file for details.
-
----
-
-**Built with ❤️ for performance-obsessed developers**
-
-⭐ Star us on GitHub if you find PerfAlly useful!
+- [Architecture decisions](./docs/architecture.md) — every major tech choice explained
+- [Roadmap](./docs/roadmap.md) — all phases overview
+- [Phase 1 — MVP](./docs/phase-1-mvp.md)
+- [Phase 2 — Pro](./docs/phase-2-pro.md)
+- [Phase 3 — Agency](./docs/phase-3-agency.md)
+- [Phase 4 — Growth](./docs/phase-4-growth.md)
