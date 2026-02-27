@@ -19,6 +19,7 @@ import { RunAuditButton } from "@/components/metrics/RunAuditButton"
 import { ChevronLeft, Share2, Globe } from "lucide-react"
 import { DownloadPDFButton } from "@/components/projects/DownloadPDFButton"
 import { ScoreHistoryChart } from "@/components/metrics/ScoreHistoryChart"
+import { DiagnosticsGrid } from "@/components/metrics/DiagnosticsGrid"
 import { ScheduleSelector } from "@/components/projects/ScheduleSelector"
 import { AlertThresholds } from "@/components/projects/AlertThresholds"
 import { PageTabs } from "@/components/projects/PageTabs"
@@ -277,6 +278,14 @@ export default async function ProjectPage({
               <MetricCard metric="fcp" value={latestAudit.fcp} fieldValue={latestAudit.cruxFcp} />
               <MetricCard metric="ttfb" value={latestAudit.ttfb} />
             </div>
+          </section>
+
+          {/* Resource breakdown */}
+          <section>
+            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Recursos
+            </h2>
+            <DiagnosticsGrid lighthouseRaw={latestAudit.lighthouseRaw} />
           </section>
 
           <Separator />
