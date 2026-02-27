@@ -58,8 +58,7 @@ export default function HomePage() {
         </Badge>
 
         <h1 className="mx-auto mb-4 max-w-2xl text-4xl font-bold tracking-tight sm:text-5xl">
-          Auditorias profissionais de performance e SEO{" "}
-          <span className="text-primary">para quem vende consultoria</span>
+          Auditorias profissionais de performance e SEO
         </h1>
 
         <p className="text-muted-foreground mx-auto mb-2 max-w-xl text-lg">

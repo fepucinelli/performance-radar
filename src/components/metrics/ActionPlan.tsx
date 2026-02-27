@@ -4,6 +4,27 @@ import type { ActionItem } from "@/lib/utils/explanations"
 import type { AIActionItem } from "@/types"
 import { AlertTriangle, AlertCircle, Info, CheckCircle2, Sparkles } from "lucide-react"
 
+/** Renders text with backtick-wrapped spans as styled inline <code> elements. */
+function InlineCode({ text }: { text: string }) {
+  const parts = text.split(/`([^`]+)`/)
+  return (
+    <>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <code
+            key={i}
+            className="rounded bg-muted px-1 py-0.5 font-mono text-[0.8em] text-foreground"
+          >
+            {part}
+          </code>
+        ) : (
+          part
+        )
+      )}
+    </>
+  )
+}
+
 interface ActionPlanProps {
   lighthouseRaw: unknown
   aiPlan?: AIActionItem[] | null
@@ -105,7 +126,9 @@ function AIActionItemCard({ item, index }: { item: AIActionItem; index: number }
           </div>
 
           {/* Action */}
-          <p className="text-muted-foreground text-sm leading-relaxed">{item.action}</p>
+          <p className="text-muted-foreground text-sm leading-relaxed">
+            <InlineCode text={item.action} />
+          </p>
 
           {/* Implementation steps */}
           {item.steps && item.steps.length > 0 && (
@@ -115,7 +138,9 @@ function AIActionItemCard({ item, index }: { item: AIActionItem; index: number }
                   <span className="text-muted-foreground shrink-0 font-mono text-xs leading-5">
                     {si + 1}.
                   </span>
-                  <span className="text-foreground/80 leading-snug">{step}</span>
+                  <span className="text-foreground/80 leading-snug">
+                    <InlineCode text={step} />
+                  </span>
                 </li>
               ))}
             </ol>
@@ -128,7 +153,7 @@ function AIActionItemCard({ item, index }: { item: AIActionItem; index: number }
           {item.stackTip && (
             <p className="text-muted-foreground rounded-md bg-violet-50 px-2.5 py-1.5 text-xs">
               <span className="font-medium text-violet-700">Dica para sua stack:</span>{" "}
-              {item.stackTip}
+              <InlineCode text={item.stackTip} />
             </p>
           )}
         </div>

@@ -278,7 +278,7 @@ Retorne APENAS um array JSON válido sem markdown, sem texto extra:
   try {
     const message = await client.messages.create({
       model,
-      max_tokens: 2048,
+      max_tokens: 4096,
       system: systemPrompt,
       messages: [{ role: "user", content: userPrompt }],
     })
