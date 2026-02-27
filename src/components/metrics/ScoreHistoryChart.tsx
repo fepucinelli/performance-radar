@@ -80,12 +80,23 @@ function formatDateWithTime(d: Date) {
   return `${date} ${time}`
 }
 
-function formatCrUXPeriodDate(p: CrUXHistoryRecord["collectionPeriods"][number]) {
-  const d = p.lastDate
-  return new Date(d.year, d.month - 1, d.day).toLocaleDateString("pt-BR", {
-    month: "short",
-    day: "numeric",
-  })
+function formatCrUXDate(
+  d: { year: number; month: number; day: number },
+  includeYear = false
+) {
+  const opts: Intl.DateTimeFormatOptions = { day: "numeric", month: "short" }
+  if (includeYear) opts.year = "numeric"
+  return new Date(d.year, d.month - 1, d.day).toLocaleDateString("pt-BR", opts)
+}
+
+/** Short tick label: "27 abr – 24 mai" */
+function formatCrUXPeriodLabel(p: CrUXHistoryRecord["collectionPeriods"][number]) {
+  return `${formatCrUXDate(p.firstDate)} – ${formatCrUXDate(p.lastDate)}`
+}
+
+/** Full tooltip label: "27 abr 2025 – 24 mai 2025" */
+function formatCrUXPeriodFull(p: CrUXHistoryRecord["collectionPeriods"][number]) {
+  return `${formatCrUXDate(p.firstDate, true)} – ${formatCrUXDate(p.lastDate, true)}`
 }
 
 function formatValue(tab: Tab, value: number) {
@@ -154,15 +165,15 @@ export function ScoreHistoryChart({ data, cruxHistory }: Props) {
 
   // ── CrUX History view ──────────────────────────────────────────────────────
 
+  const cruxP75s = hasCruxHistory ? getCrUXHistoryP75s(cruxHistory!, cruxTab) : []
+
   const cruxHistoryData = hasCruxHistory
-    ? cruxHistory!.collectionPeriods.map((period, i) => {
-        const p75s = getCrUXHistoryP75s(cruxHistory!, cruxTab)
-        return {
-          index: i,
-          date: formatCrUXPeriodDate(period),
-          value: p75s[i] ?? null,
-        }
-      })
+    ? cruxHistory!.collectionPeriods.map((period, i) => ({
+        index: i,
+        periodLabel: formatCrUXPeriodLabel(period),
+        periodFull: formatCrUXPeriodFull(period),
+        value: cruxP75s[i] ?? null,
+      }))
     : []
 
   const cruxHistoryRefs = REFS[cruxTab]
@@ -386,16 +397,17 @@ export function ScoreHistoryChart({ data, cruxHistory }: Props) {
             </span>
           </div>
 
-          <ResponsiveContainer width="100%" height={200}>
-            <LineChart data={cruxHistoryData} margin={{ top: 4, right: 8, bottom: 0, left: -8 }}>
+          <ResponsiveContainer width="100%" height={230}>
+            <LineChart data={cruxHistoryData} margin={{ top: 4, right: 8, bottom: 8, left: -8 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis
                 dataKey="index"
-                tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", angle: -35, textAnchor: "end" }}
                 tickLine={false}
                 axisLine={false}
-                interval={4}
-                tickFormatter={(i: number) => cruxHistoryData[i]?.date ?? ""}
+                interval={5}
+                height={54}
+                tickFormatter={(i: number) => cruxHistoryData[i]?.periodLabel ?? ""}
               />
               <YAxis
                 tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
@@ -407,11 +419,11 @@ export function ScoreHistoryChart({ data, cruxHistory }: Props) {
               <Tooltip
                 content={({ active, payload }) => {
                   if (!active || !payload?.length) return null
-                  const point = payload[0]?.payload as { date: string; value: number | null } | undefined
+                  const point = payload[0]?.payload as { periodFull: string; value: number | null } | undefined
                   const val = point?.value
                   return (
                     <div style={{ fontSize: 12, borderRadius: 8, border: "1px solid hsl(var(--border))", background: "hsl(var(--background))", padding: "8px 10px" }}>
-                      <p style={{ fontWeight: 600, marginBottom: 6 }}>{point?.date}</p>
+                      <p style={{ fontWeight: 600, marginBottom: 6 }}>{point?.periodFull}</p>
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <span style={{ display: "inline-block", width: 10, height: 3, borderRadius: 2, backgroundColor: CRUX_COLOR, flexShrink: 0 }} />
                         <span style={{ color: "hsl(var(--muted-foreground))" }}>P75 real</span>
