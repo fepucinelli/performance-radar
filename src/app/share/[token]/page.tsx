@@ -14,6 +14,7 @@ import { ActionPlan } from "@/components/metrics/ActionPlan"
 import { AuditList } from "@/components/metrics/AuditList"
 import { SEOAuditList } from "@/components/metrics/SEOAuditList"
 import { SiteHealthCard } from "@/components/metrics/SiteHealthCard"
+import { FilmstripViewer } from "@/components/metrics/FilmstripViewer"
 import { Globe, Zap } from "lucide-react"
 import { formatDate } from "@/lib/utils/date"
 import type { AIActionItem } from "@/types"
@@ -122,6 +123,21 @@ export default async function SharePage({
             <MetricCard metric="inp" value={audit.inp} fieldValue={audit.cruxInp} />
             <MetricCard metric="cls" value={audit.cls} fieldValue={audit.cruxCls} />
           </div>
+        </section>
+
+        {/* Visual loading filmstrip */}
+        <section>
+          <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            Carregamento Visual
+          </h2>
+          <p className="text-muted-foreground mb-3 text-xs">
+            Como a página apareceu para o usuário ao longo do tempo. Clique em um frame para ampliar.
+          </p>
+          <FilmstripViewer
+            lighthouseRaw={audit.lighthouseRaw}
+            lcp={audit.lcp}
+            fcp={audit.fcp}
+          />
         </section>
 
         {/* Diagnostics */}
