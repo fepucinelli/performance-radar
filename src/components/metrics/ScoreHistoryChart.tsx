@@ -402,12 +402,25 @@ export function ScoreHistoryChart({ data, cruxHistory }: Props) {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis
                 dataKey="index"
-                tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))", angle: -35, textAnchor: "end" }}
                 tickLine={false}
                 axisLine={false}
                 interval={5}
                 height={54}
-                tickFormatter={(i: number) => cruxHistoryData[i]?.periodLabel ?? ""}
+                tick={(props: { x: string | number; y: string | number; payload: { value: number } }) => (
+                  <g transform={`translate(${props.x},${props.y})`}>
+                    <text
+                      x={0}
+                      y={0}
+                      dy={4}
+                      textAnchor="end"
+                      fill="hsl(var(--muted-foreground))"
+                      fontSize={10}
+                      transform="rotate(-35)"
+                    >
+                      {cruxHistoryData[props.payload.value]?.periodLabel ?? ""}
+                    </text>
+                  </g>
+                )}
               />
               <YAxis
                 tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}

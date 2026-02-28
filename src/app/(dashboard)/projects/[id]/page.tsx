@@ -20,6 +20,7 @@ import { ChevronLeft, Share2, Globe } from "lucide-react"
 import { DownloadPDFButton } from "@/components/projects/DownloadPDFButton"
 import { ScoreHistoryChart } from "@/components/metrics/ScoreHistoryChart"
 import { DiagnosticsGrid } from "@/components/metrics/DiagnosticsGrid"
+import { FilmstripViewer } from "@/components/metrics/FilmstripViewer"
 import { ScheduleSelector } from "@/components/projects/ScheduleSelector"
 import { AlertThresholds } from "@/components/projects/AlertThresholds"
 import { PageTabs } from "@/components/projects/PageTabs"
@@ -267,6 +268,21 @@ export default async function ProjectPage({
                 fieldValue={latestAudit.cruxCls}
               />
             </div>
+          </section>
+
+          {/* Visual loading filmstrip */}
+          <section>
+            <h2 className="mb-1 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              Carregamento Visual
+            </h2>
+            <p className="text-muted-foreground mb-3 text-xs">
+              Como a página apareceu para o usuário ao longo do tempo. Clique em um frame para ampliar.
+            </p>
+            <FilmstripViewer
+              lighthouseRaw={latestAudit.lighthouseRaw}
+              lcp={latestAudit.lcp}
+              fcp={latestAudit.fcp}
+            />
           </section>
 
           {/* Diagnostic metrics */}
