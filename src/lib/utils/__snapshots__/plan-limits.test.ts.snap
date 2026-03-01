@@ -1,0 +1,54 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`PLAN_LIMITS > matches snapshot 1`] = `
+{
+  "agency": {
+    "aiActionPlansPerMonth": -1,
+    "emailAlerts": true,
+    "historyDays": 365,
+    "hourlyRuns": true,
+    "manualRunsPerMonth": -1,
+    "maxPagesPerProject": -1,
+    "maxProjects": 100,
+    "pdfReports": true,
+    "scheduledRuns": true,
+    "slackAlerts": true,
+  },
+  "free": {
+    "aiActionPlansPerMonth": 0,
+    "emailAlerts": false,
+    "historyDays": 7,
+    "hourlyRuns": false,
+    "manualRunsPerMonth": 5,
+    "maxPagesPerProject": 2,
+    "maxProjects": 1,
+    "pdfReports": false,
+    "scheduledRuns": false,
+    "slackAlerts": false,
+  },
+  "pro": {
+    "aiActionPlansPerMonth": 30,
+    "emailAlerts": true,
+    "historyDays": 90,
+    "hourlyRuns": true,
+    "manualRunsPerMonth": -1,
+    "maxPagesPerProject": 50,
+    "maxProjects": 20,
+    "pdfReports": true,
+    "scheduledRuns": true,
+    "slackAlerts": true,
+  },
+  "starter": {
+    "aiActionPlansPerMonth": 5,
+    "emailAlerts": true,
+    "historyDays": 30,
+    "hourlyRuns": false,
+    "manualRunsPerMonth": -1,
+    "maxPagesPerProject": 10,
+    "maxProjects": 5,
+    "pdfReports": false,
+    "scheduledRuns": true,
+    "slackAlerts": false,
+  },
+}
+`;
