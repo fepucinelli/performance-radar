@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Globe, BookOpen, ListChecks, Bell, Search } from "lucide-react"
+import { Globe, ListChecks, Bell, Search } from "lucide-react"
 
 export const metadata: Metadata = {
   title: "PerfAlly — Auditorias profissionais de performance e SEO",

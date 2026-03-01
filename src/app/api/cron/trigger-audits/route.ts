@@ -9,8 +9,8 @@
  *
  * Protected by CRON_SECRET to prevent unauthorized triggers.
  */
-import { NextRequest } from "next/server"
-import { db, projects, projectPages } from "@/lib/db"
+import type { NextRequest } from "next/server"
+import { db, projects } from "@/lib/db"
 import { ne, or, isNull, lte, eq } from "drizzle-orm"
 import { env } from "@/env"
 import { runAuditForProject } from "@/lib/audit-runner"

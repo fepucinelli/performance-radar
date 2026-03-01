@@ -492,6 +492,7 @@ function ProjectCoverPage({
       <View style={[styles.coverAccentBar, { backgroundColor: accent }]} />
 
       {branding?.agencyLogoUrl && (
+        // eslint-disable-next-line jsx-a11y/alt-text
         <Image
           src={branding.agencyLogoUrl}
           style={{ width: 80, marginBottom: 8 }}
@@ -715,6 +716,7 @@ function CoverSummaryPage({
       <View style={[styles.coverAccentBar, { backgroundColor: accent }]} />
       {pageLabel && <PageSectionBadge label={pageLabel} />}
       {branding?.agencyLogoUrl && (
+        // eslint-disable-next-line jsx-a11y/alt-text
         <Image
           src={branding.agencyLogoUrl}
           style={{ width: 80, marginBottom: 8 }}

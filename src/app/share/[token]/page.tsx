@@ -4,7 +4,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { db, auditResults, projects } from "@/lib/db"
+import { db, auditResults } from "@/lib/db"
 import { eq } from "drizzle-orm"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"

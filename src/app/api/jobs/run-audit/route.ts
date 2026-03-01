@@ -8,7 +8,7 @@
  * In dev (no signing keys): skips verification for easy local testing.
  */
 import { db, projects, projectPages } from "@/lib/db"
-import { eq, and } from "drizzle-orm"
+import { eq } from "drizzle-orm"
 import { env } from "@/env"
 import { runAuditForProject, PSIError } from "@/lib/audit-runner"
 import { tomorrowNoonBRT } from "@/lib/utils/schedule"
