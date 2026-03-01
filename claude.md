@@ -1,301 +1,245 @@
-# PerfAlly Development Guide for Claude
+# PerfAlly development guide
 
-**Project:** SaaS performance metrics platform with AI-powered explanations  
-**Current Phase:** Phase 2 (Pro features) - Database & Billing focus  
-**Stack:** Next.js 14 (App Router), PostgreSQL, Stripe, TailwindCSS, TypeScript
-
----
-
-## 🏗️ Architecture Overview
-
-### Core Principles
-1. **Server-First**: Use Server Actions over API routes when possible (performance, type safety)
-2. **Performance-Oriented**: Optimize for speed & token efficiency
-3. **Type Safety**: Leverage TypeScript strictly across the stack
-4. **Senior Patterns**: Choose proven, scalable patterns over shortcuts
-
-### Project Structure
-```
-/src
-  /app              # Next.js 14 App Router
-    /dashboard      # Main dashboard & metrics
-    /settings       # User settings & billing
-    /api           # Strategic API routes (webhooks, external APIs)
-  /components       # Reusable React components
-  /lib
-    /actions        # Server Actions (prefer these)
-    /db            # Database queries & migrations
-    /stripe        # Stripe integration logic
-    /utils         # Helper functions
-  /types           # Shared TypeScript definitions
-  /hooks           # Custom React hooks
-  /styles          # Global styles
-/docs             # Phase roadmaps & architecture decisions
-/public           # Static assets
-```
+**Project:** SaaS web performance and SEO audit platform
+**Current phase:** Phase 3 complete — Phases 0–3 shipped
+**Stack:** Next.js 16.1.6, React 19, Drizzle ORM, Neon PostgreSQL, Stripe,
+Tailwind CSS v4, TypeScript, Clerk
 
 ---
 
-## 📊 Database Architecture (Priority Focus)
+## Architecture principles
 
-### Current Schema
-- **users** → Core authentication, plan tier (free/pro/agency)
-- **projects** → User's performance metrics containers
-- **metrics** → Raw data points (Core Web Vitals, custom metrics)
-- **explanations** → AI-generated insights (follow `explanations.ts` pattern)
-- **billing_events** → Stripe webhook logs & usage tracking
+1. **Server-first** — use Server Actions over API routes when possible
+2. **Type safety** — TypeScript strict mode throughout; no `any`
+3. **Minimal queries** — select only needed fields, batch with `Promise.all()`,
+   paginate large result sets
+4. **Plan enforcement** — always check `users.plan` (not the Stripe API) before
+   gating features
 
-### Key Patterns
-**Always use Server Actions for DB queries:**
+---
+
+## Project structure
+
+```
+src/
+├── app/
+│   ├── (auth)/               # Sign-in / sign-up (Clerk)
+│   ├── (dashboard)/          # Protected app routes
+│   │   ├── dashboard/        # Project list
+│   │   ├── projects/[id]/    # Project detail, page tabs, audit history
+│   │   └── settings/         # Billing, alerts, branding
+│   ├── (marketing)/          # Landing page
+│   ├── share/[token]/        # Public read-only audit report
+│   ├── actions/              # Server Actions (prefer over API routes)
+│   │   ├── projects.ts
+│   │   ├── billing.ts
+│   │   ├── alerts.ts
+│   │   ├── schedule.ts
+│   │   └── branding.ts
+│   └── api/
+│       ├── webhooks/stripe/  # Subscription lifecycle
+│       ├── webhooks/clerk/   # User sync to DB
+│       ├── upload/logo/      # Logo upload → Vercel Blob
+│       ├── projects/[id]/audit/   # Manual audit trigger
+│       ├── projects/[id]/reports/ # PDF generation
+│       ├── cron/trigger-audits/   # Vercel Cron → QStash fan-out
+│       └── jobs/run-audit/        # QStash job handler
+├── components/
+│   ├── metrics/              # SiteHealthCard, MetricCard, ActionPlan, etc.
+│   ├── projects/             # PageTabs, AlertThresholds, DownloadPDFButton, etc.
+│   └── layout/               # Sidebar, org-switcher, user-menu
+├── lib/
+│   ├── api/
+│   │   ├── pagespeed.ts      # PSI API client
+│   │   └── crux-history.ts  # CrUX History API
+│   ├── ai/
+│   │   └── action-plan.ts   # Tiered AI action plan generation
+│   ├── db/
+│   │   ├── index.ts         # Drizzle + Neon client
+│   │   └── schema.ts        # All table definitions
+│   └── utils/
+│       ├── metrics.ts        # CWV thresholds and grading
+│       ├── plan-limits.ts    # PLAN_LIMITS constant
+│       ├── validate-url.ts   # URL validation (blocks private IPs)
+│       └── get-plan.ts       # getUserPlan(userId) helper
+├── types/
+│   └── index.ts             # Shared types: PSIAuditData, AIActionItem, etc.
+├── env.ts                   # Typed env (@t3-oss/env-nextjs + Zod)
+└── proxy.ts                 # Clerk middleware (Next.js 16 uses proxy.ts)
+```
+
+---
+
+## Key files
+
+| Area | File |
+|------|------|
+| DB client + schema | `src/lib/db/index.ts`, `src/lib/db/schema.ts` |
+| Server Actions | `src/app/actions/*.ts` |
+| Stripe | `src/lib/stripe.ts`, `src/app/actions/billing.ts` |
+| AI action plans | `src/lib/ai/action-plan.ts` |
+| Audit runner | `src/lib/audit-runner.ts` |
+| Plan limits | `src/lib/utils/plan-limits.ts` |
+| Types | `src/types/index.ts` |
+| Env validation | `src/env.ts` |
+
+---
+
+## Database schema (summary)
+
+Tables: `users`, `projects`, `project_pages`, `audit_results`, `alerts`,
+`reports`.
+
+Full schema: `src/lib/db/schema.ts`. Architecture decisions:
+`docs/architecture.md`.
+
+**Plan enum values** (fixed in DB — display names are UI-only):
+
+| DB key | Display name | Price |
+|--------|--------------|-------|
+| `free` | Grátis | R$0 |
+| `starter` | Freelancer | R$89/month |
+| `pro` | Studio | R$199/month |
+| `agency` | Agência | R$449/month |
+
+---
+
+## Coding patterns
+
+### Server Actions
+
+Prefer Server Actions over API routes for all authenticated data mutations.
+
 ```typescript
-// ✅ GOOD - Server Action with type safety
+// src/app/actions/projects.ts
 'use server'
-export async function getProjectMetrics(projectId: string) {
-  const metrics = await db.metrics.findMany({
-    where: { projectId },
-    orderBy: { timestamp: 'desc' },
-    take: 100
-  })
-  return metrics
-}
+import { auth } from "@clerk/nextjs/server"
 
-// ❌ AVOID - API route unless external integration required
+export async function createProjectAction(...) {
+  const { userId, orgId } = await auth()
+  if (!userId) redirect("/sign-in")
+  // ...
+}
 ```
 
-**Query Optimization:**
-- Use indexed columns: `projectId`, `userId`, `timestamp`
-- Batch queries with `Promise.all()` when independent
-- Paginate large result sets (take: 50, skip: offset)
-- Select only needed fields with `select: { ... }`
+### Ownership queries
 
-### Phase 2 Database Updates
-- [ ] Implement `subscription_tiers` table (free/pro/agency limits)
-- [ ] Add `usage_logs` for tracking API calls & dashboard views
-- [ ] Create `billing_cycles` for cycle management
-- [ ] Add indexes on: `(userId, createdAt)`, `(projectId, timestamp)`
+All project queries must check org or user ownership:
 
----
-
-## 💳 Stripe Billing Strategy (Phase 2 Focus)
-
-### Server Action Pattern
 ```typescript
-// Inside /src/lib/actions/billing.ts
-'use server'
-export async function createCheckoutSession(projectId: string, tier: 'pro' | 'agency') {
-  const user = await getCurrentUser()
-  
-  // Validate tier access rules
-  // Create Stripe session
-  // Log event to billing_events table
-  // Return session URL
-}
+const ownershipFilter = orgId
+  ? and(eq(projects.id, projectId), eq(projects.orgId, orgId))
+  : and(eq(projects.id, projectId), eq(projects.userId, userId))
 ```
 
-### Webhook Handling
-- Stripe→ API route `/api/webhooks/stripe`
-- Update `users.plan_tier`, `subscription_status`
-- Log to `billing_events` for audit trail
-- Use `stripe.webhooks.constructEvent()` for security
+### Query optimization
 
-### Key Integration Points
-1. **Subscription Creation** → Update user tier + create billing cycle
-2. **Payment Success** → Enable Pro features, reset usage quota
-3. **Subscription Cancelled** → Downgrade to free, send retention email
-4. **Invoice Finalized** → Send receipt, log in usage dashboard
-
----
-
-## 🤖 AI Explanations Pattern
-
-**Files:** `/src/lib/explanations.ts`, `/src/components/ExplanationCard.tsx`
-
-### Advanced Pattern (Current)
-1. Fetch raw metrics data (minimal, indexed query)
-2. Call Claude API via Server Action (streaming response)
-3. Parse response into structured format
-4. Cache explanation in `explanations` table
-5. Stream to client with real-time updates
-
-### Performance Optimization
-- Cache explanations for 24h (same metrics = same insight)
-- Don't re-explain unchanged metric values
-- Use `unstable_cache()` for stable calculations
-- Request only relevant Claude model (Haiku for summaries, better model for deep analysis)
-
----
-
-## Type System Conventions
-
-**Shared types in `/src/types/index.ts`:**
-```typescript
-// User & Auth
-export type UserTier = 'free' | 'pro' | 'agency'
-export interface User {
-  id: string
-  email: string
-  plan_tier: UserTier
-  subscription_id?: string
-  created_at: Date
-}
-
-// Metrics
-export interface Metric {
-  id: string
-  projectId: string
-  timestamp: Date
-  coreWebVitals: {
-    lcp: number
-    fid: number
-    cls: number
-  }
-}
-
-// Explanations
-export interface Explanation {
-  id: string
-  metricId: string
-  content: string
-  summary: string
-  cached_at: Date
-}
-```
-
-**Database Query Returns:**
-- Use Zod for runtime validation on external data
-- TypeScript inference for DB models (from ORM/client)
-- Create `type-safe` wrapper around queries
-
----
-
-## 🔍 Common PR/Development Checklist
-
-### Before asking Claude, ensure:
-- [ ] **Database**: Query follows indexed columns + pagination pattern
-- [ ] **Types**: All DB returns typed, no `any` types
-- [ ] **Server Actions**: Used instead of API routes (unless webhooks/external)
-- [ ] **Performance**: No N+1 queries, unnecessary loops, or re-renders
-- [ ] **Stripe**: Webhook logged, idempotent, error handling added
-- [ ] **Tests**: At least one happy-path test for critical flows
-
-### Claude Review Request Template
-```
-I'm implementing [feature]. Here's my approach:
-1. [Database query/schema change]
-2. [UI/component change]
-3. [Stripe/billing integration point]
-
-Should I optimize [specific concern]? Any senior patterns I'm missing?
-```
-
----
-
-## ⚡ Performance Optimization Tips
-
-### Database
-- Always use `take: X` + cursor-based pagination for large sets
-- Avoid `SELECT *` → use explicit `select: { ... }`
-- Index on: `(userId, createdAt)`, `(projectId, createdAt)`, `timestamp`
-- Use connection pooling (PgBouncer recommended)
-
-### API/Server Actions
+- Select only needed fields: `columns: { id: true, url: true }`
 - Batch independent queries with `Promise.all()`
-- Use `unstable_cache()` for stable calculations (24h TTL)
-- Stream Claude responses (don't wait for full response)
-- Compress API responses with `gzip`
-
-### Frontend
-- Use `React.memo()` for expensive metric charts
-- Lazy-load explanation cards (only fetch on scroll)
-- Prefetch next phase data on route hover
-- Cache explanations client-side for 1h
-
-### Token Efficiency
-- Don't include full `pnpm-lock.yaml` or `.next/` build output
-- Focus Claude on `/src` and `/docs` only
-- Ask specific questions with file context, not entire project
-- Use phase docs from `/docs` instead of re-explaining architecture
+- Use indexed columns: `userId`, `projectId`, `createdAt`
 
 ---
 
-## 📖 How to Extend Features
+## Plan enforcement
 
-### Adding a New Metric Type
-1. Add to `Metric` schema in database
-2. Update `/src/types/index.ts` with new property
-3. Create Server Action in `/src/lib/actions/metrics.ts`
-4. Build UI component in `/src/components/MetricCard.tsx`
-5. Add test case in `/src/lib/__tests__/metrics.test.ts`
+Plan limits live in `src/lib/utils/plan-limits.ts` (`PLAN_LIMITS` constant).
 
-### Adding Phase 2 Pro Feature
-1. Check `/docs/phase-2-roadmap.md` for requirements
-2. Add feature flag in database: `users.features_enabled`
-3. Implement Server Action + type-safe query
-4. Protect UI with `<ProFeatureGate tier="pro">`
-5. Log feature usage to `billing_events`
-
-### Stripe Integration Point
-1. Define webhook event in `/api/webhooks/stripe`
-2. Create handler Server Action in `/lib/actions/billing.ts`
-3. Update user record atomically
-4. Log to `billing_events` table
-5. Test with Stripe CLI locally
+| Limit | Enforced in |
+|-------|-------------|
+| `maxProjects` | `createProjectAction` |
+| `maxPagesPerProject` | `addPageAction` |
+| `manualRunsPerMonth` | `POST /api/projects/[id]/audit` |
+| `aiActionPlansPerMonth` | `maybeGenerateAIActionPlan` in `audit-runner.ts` |
+| `historyDays` | Date filter on history queries |
 
 ---
 
-## 🚀 Quick Commands
+## Stripe webhooks
+
+Webhook handler: `src/app/api/webhooks/stripe/route.ts`
+
+Handled events:
+- `checkout.session.completed` — set plan + `stripeCustomerId` on user
+- `customer.subscription.updated` — sync plan changes
+- `customer.subscription.deleted` — downgrade to `free`
+
+All signature verification uses `stripe.webhooks.constructEvent`. Always check
+`users.plan` in the DB, not the Stripe API, to gate features.
+
+---
+
+## Background jobs
+
+```
+Vercel Cron (hourly)
+  → POST /api/cron/trigger-audits   (protected by CRON_SECRET)
+    → QStash: one job per due project page
+      → POST /api/jobs/run-audit    (signature verified by Upstash Receiver)
+          → runAuditForProject()
+```
+
+`runAuditForProject()` in `src/lib/audit-runner.ts` is the single shared
+entry point for both manual and cron audits.
+
+---
+
+## AI action plans
+
+Model selection is tiered by plan — see `src/lib/ai/action-plan.ts`:
+
+| DB key | Model |
+|--------|-------|
+| `free` | — (static fallback only) |
+| `starter` | `claude-haiku-4-5-20251001` |
+| `pro` | `claude-sonnet-4-6` |
+| `agency` | `claude-sonnet-4-6` |
+
+The static fallback in `src/lib/utils/explanations.ts` always runs when AI is
+unavailable (missing key, quota reached, API error).
+
+---
+
+## Common gotchas
+
+- **`proxy.ts` not `middleware.ts`** — Next.js 16 Clerk middleware is in
+  `src/proxy.ts`
+- **drizzle-kit + `.env.local`** — `drizzle.config.ts` loads it manually via
+  `dotenv`; use `pnpm exec drizzle-kit push --force` (not `pnpm db:push`)
+- **INP has no lab value** — `crux_inp` (CrUX P75) is the only INP source;
+  `audit_results.inp` is always null
+- **CrUX CLS is ×100** — divide `CUMULATIVE_LAYOUT_SHIFT_SCORE` by 100 before
+  grading
+- **`noUncheckedIndexedAccess: true`** — `array[0]` returns `T | undefined`;
+  use optional chaining
+- **Tailwind v4** — CSS-based config via `@import "tailwindcss"` in
+  `globals.css`; no `tailwind.config.ts`
+- **Logo URLs must be absolute for PDF** — `@react-pdf/renderer` can't resolve
+  relative paths; the reports route converts them using the request origin
+- **Clerk Organizations** — must be enabled manually in Clerk Dashboard →
+  Settings → Organizations; `orgId` is available from `auth()`
+
+---
+
+## Commands
 
 ```bash
-# Development
-pnpm dev              # Start dev server + local Stripe webhook
-
-# Database
-pnpm db:migrate       # Run pending migrations
-pnpm db:seed         # Seed dev data
-pnpm db:studio       # Open Prisma Studio
-
-# Testing
-pnpm test             # Run all tests
-pnpm test:watch      # Watch mode
-pnpm test:coverage   # Coverage report
-
-# Build & Deploy
-pnpm build            # Build for production
-pnpm vercel:deploy    # Deploy to Vercel
+pnpm dev                             # Start dev server
+pnpm build                           # Production build
+pnpm lint                            # ESLint
+pnpm exec tsc --noEmit              # Type check
+pnpm exec drizzle-kit push --force  # Push schema to Neon
+pnpm db:studio                       # Drizzle Studio (visual DB explorer)
 ```
 
 ---
 
-## 📚 Docs Reference
+## Docs
 
-When asking about Phase 2 features, reference:
-- `/docs/phase-2-roadmap.md` - Pro feature list & requirements
-- `/docs/architecture.md` - System design & decisions
-- `/docs/database-schema.md` - Full schema with relationships
-- `/docs/stripe-integration.md` - Billing flow & webhook events
+- [`docs/architecture.md`](./docs/architecture.md) — tech decisions and
+  reasoning
+- [`docs/roadmap.md`](./docs/roadmap.md) — phases, features, and pricing
 
 ---
 
-## Key Files to Know
-
-**When asking questions, reference these:**
-- **Database**: `/src/lib/db.ts`, migrations in `/prisma`
-- **Billing**: `/src/lib/stripe.ts`, `/src/lib/actions/billing.ts`
-- **Explanations**: `/src/lib/explanations.ts` (AI pattern)
-- **Types**: `/src/types/index.ts` (single source of truth)
-- **Server Actions**: `/src/lib/actions/*.ts` (prefer over API routes)
-
----
-
-## Tone & Style Guide
-
-- **Be specific**: "I'm adding a usage quota. Should I track it per month or per billing cycle?"
-- **Provide context**: Include relevant file references, current implementation
-- **Ask for patterns**: "What's the senior approach for [problem] in our stack?"
-- **Think phases**: "Does this decision block Phase 3 Agency features?"
-
----
-
-**Last Updated:** Feb 25, 2026  
-**Maintainer:** Felipe Pucinelli  
-**Focus Areas:** Phase 2 (Database & Billing), Architecture, Performance
+**Last updated:** March 1, 2026
+**Maintainer:** Felipe Pucinelli
