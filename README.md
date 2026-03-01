@@ -11,6 +11,12 @@
 
 ---
 
+## Screenshots
+
+![PerfAlly — audit dashboard, visual filmstrip, AI action plan, performance trend, and monitoring settings](./public/screenshots.png)
+
+---
+
 ## What it does
 
 PerfAlly runs PageSpeed Insights audits on your clients' sites and turns raw
