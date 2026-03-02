@@ -1,8 +1,9 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, Settings, Zap } from "lucide-react"
+import { LayoutDashboard, Settings } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
@@ -29,8 +30,8 @@ export function Sidebar() {
           href="/dashboard"
           className="flex items-center gap-2 font-semibold tracking-tight"
         >
-          <Zap className="h-4 w-4 text-amber-500" />
-          PerfAlly
+          <Image src="/favicon.png" alt="Performance Hero" width={20} height={20} className="rounded-md" />
+          Performance Hero
         </Link>
       </div>
 

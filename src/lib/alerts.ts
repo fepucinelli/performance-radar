@@ -108,7 +108,7 @@ export async function checkAndFireAlerts(
     )
 
     await resend.emails.send({
-      from: "PerfAlly <alerts@perf-ally.com>",
+      from: "Performance Hero <alerts@perfhero.com>",
       to: user.email,
       subject: `Performance alert: ${project.name} — ${toFire.length} metric${toFire.length > 1 ? "s" : ""} exceeded threshold`,
       html,

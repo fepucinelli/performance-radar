@@ -16,14 +16,59 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "PerfAlly",
-    template: "%s | PerfAlly",
+    default: "Performance Hero",
+    template: "%s | Performance Hero",
   },
   description:
-    "Building a website is no longer the challenge; maintaining speed and performance at scale is. Plain-English reports with a prioritized action plan.",
+    "Professional performance and SEO audits for agencies and freelancers. Monitor your clients' sites. Generate impressive reports with AI-powered action plans.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
   ),
+  applicationName: "Performance Hero",
+  keywords: [
+    "web performance",
+    "SEO audit",
+    "Core Web Vitals",
+    "PageSpeed",
+    "Lighthouse",
+    "performance monitoring",
+    "site audit",
+    "freelancer tools",
+    "agency tools",
+  ],
+  icons: {
+    icon: [
+      { url: "/favicon.png", sizes: "any" },
+    ],
+    apple: [
+      { url: "/favicon.png", sizes: "180x180" },
+    ],
+  },
+  openGraph: {
+    title: "Performance Hero",
+    description:
+      "Professional performance and SEO audits for agencies and freelancers. Monitor your clients' sites. Generate impressive reports.",
+    images: [{ url: "/hero-image.png", width: 1024, height: 1024, alt: "Performance Hero — Web Performance Auditing" }],
+    type: "website",
+    siteName: "Performance Hero",
+    locale: "pt_BR",
+  },
+  twitter: {
+    card: "summary",
+    title: "Performance Hero",
+    description:
+      "Professional performance and SEO audits. Monitor your clients' sites. Generate impressive reports.",
+    images: [{ url: "/hero-image.png", alt: "Performance Hero — Web Performance Auditing" }],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+    },
+  },
 }
 
 export default function RootLayout({

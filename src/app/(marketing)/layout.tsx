@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Zap } from "lucide-react"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 
 export default function MarketingLayout({
@@ -15,8 +15,8 @@ export default function MarketingLayout({
             href="/"
             className="flex items-center gap-2 font-semibold tracking-tight"
           >
-            <Zap className="h-4 w-4 text-amber-500" />
-            PerfAlly
+            <Image src="/favicon.png" alt="Performance Hero" width={22} height={22} className="rounded-md" />
+            Performance Hero
           </Link>
           <nav className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
@@ -34,7 +34,7 @@ export default function MarketingLayout({
       <footer className="border-border/40 border-t py-8">
         <div className="mx-auto max-w-5xl px-4">
           <p className="text-muted-foreground text-center text-sm">
-            © {new Date().getFullYear()} PerfAlly. Built for founders.
+            © {new Date().getFullYear()} Performance Hero. Built for founders.
           </p>
         </div>
       </footer>

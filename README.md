@@ -1,8 +1,11 @@
-# PerfAlly
+# Performance Hero
 
-> Professional performance and SEO audits for developers who sell consulting.
-> Monitor your clients' sites. Generate impressive reports. Charge like a
-> specialist.
+<p align="center">
+  <img src="./public/hero-image.png" alt="Performance Hero" width="180" />
+</p>
+
+> Professional performance and SEO audits for agencies and freelancers.
+> Monitor your clients' sites. Generate impressive reports.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js)](https://nextjs.org)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square&logo=typescript)](https://www.typescriptlang.org)
@@ -11,15 +14,9 @@
 
 ---
 
-## Screenshots
-
-![PerfAlly — audit dashboard, visual filmstrip, AI action plan, performance trend, and monitoring settings](./public/screenshots.png)
-
----
-
 ## What it does
 
-PerfAlly runs PageSpeed Insights audits on your clients' sites and turns raw
+Performance Hero runs PageSpeed Insights audits on your clients' sites and turns raw
 Lighthouse data into deliverable reports. Each report includes a Site Health
 score, failing SEO and accessibility items labeled in plain Portuguese,
 AI-generated action plans with concrete implementation steps, and 25 weeks of
@@ -219,8 +216,8 @@ src/
 ### 1. Clone and install
 
 ```bash
-git clone https://github.com/fepucinelli/perf-ally.git
-cd perf-ally
+git clone https://github.com/fepucinelli/perfhero.git
+cd perfhero
 pnpm install
 ```
 

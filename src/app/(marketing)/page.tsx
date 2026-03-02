@@ -1,11 +1,12 @@
 import type { Metadata } from "next"
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Globe, ListChecks, Bell, Search } from "lucide-react"
 
 export const metadata: Metadata = {
-  title: "PerfAlly — Auditorias profissionais de performance e SEO",
+  title: "Performance Hero — Auditorias profissionais de performance e SEO",
 }
 
 // Static metric examples for the hero section — intentionally a bad site
@@ -53,6 +54,17 @@ export default function HomePage() {
     <>
       {/* Hero */}
       <section className="mx-auto max-w-5xl px-4 pb-16 pt-20 text-center">
+        <div className="mb-6 flex justify-center">
+          <Image
+            src="/hero-image.png"
+            alt="Performance Hero"
+            width={360}
+            height={360}
+            priority
+            className="drop-shadow-xl"
+          />
+        </div>
+
         <Badge variant="secondary" className="mb-4">
           Grátis para começar — sem cartão de crédito
         </Badge>

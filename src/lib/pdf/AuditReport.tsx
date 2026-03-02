@@ -456,7 +456,7 @@ function getFailingSEOItems(lhr: LighthouseResult) {
 function PageFooter({ agency }: { agency?: string | null }) {
   return (
     <View style={styles.pageFooter} fixed>
-      <Text>{agency ?? "PerfAlly"}</Text>
+      <Text>{agency ?? "Performance Hero"}</Text>
       <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
     </View>
   )
@@ -669,8 +669,8 @@ function ProjectCoverPage({
       })}
 
       <View style={styles.coverFooter}>
-        <Text>{branding?.agencyContact ?? "perfally.com"}</Text>
-        <Text>Gerado por PerfAlly</Text>
+        <Text>{branding?.agencyContact ?? "perfhero.com"}</Text>
+        <Text>Gerado por Performance Hero</Text>
       </View>
       <PageFooter agency={branding?.agencyName} />
     </Page>
@@ -901,8 +901,8 @@ function CoverSummaryPage({
         )
       })}
       <View style={styles.coverFooter}>
-        <Text>{branding?.agencyContact ?? "perfally.com"}</Text>
-        <Text>Gerado por PerfAlly</Text>
+        <Text>{branding?.agencyContact ?? "perfhero.com"}</Text>
+        <Text>Gerado por Performance Hero</Text>
       </View>
       <PageFooter agency={branding?.agencyName} />
     </Page>
@@ -1286,7 +1286,7 @@ export function AuditReportPDF({ project, pages, branding }: ReportProps) {
   return (
     <Document
       title={`Relatório de Performance — ${project.name}`}
-      author={branding?.agencyName ?? "PerfAlly"}
+      author={branding?.agencyName ?? "Performance Hero"}
       subject="Relatório de Core Web Vitals"
     >
       {isMultiPage && (

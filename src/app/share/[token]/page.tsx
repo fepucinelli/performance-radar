@@ -15,6 +15,7 @@ import { AuditList } from "@/components/metrics/AuditList"
 import { SEOAuditList } from "@/components/metrics/SEOAuditList"
 import { SiteHealthCard } from "@/components/metrics/SiteHealthCard"
 import { FilmstripViewer } from "@/components/metrics/FilmstripViewer"
+import Image from "next/image"
 import { Globe, Zap } from "lucide-react"
 import { formatDate } from "@/lib/utils/date"
 import type { AIActionItem } from "@/types"
@@ -65,8 +66,8 @@ export default async function SharePage({
       <header className="sticky top-0 z-10 border-b bg-white/90 backdrop-blur-sm">
         <div className="mx-auto flex h-12 max-w-3xl items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-1.5 text-sm font-semibold">
-            <Zap className="h-4 w-4 text-amber-500" />
-            PerfAlly
+            <Image src="/favicon.png" alt="Performance Hero" width={18} height={18} className="rounded-sm" />
+            Performance Hero
           </Link>
           <Button size="sm" asChild>
             <Link href="/sign-up">Analise seu site gratuitamente →</Link>
