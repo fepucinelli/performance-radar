@@ -385,6 +385,14 @@ Set all environment variables in the Vercel dashboard, then wire:
 
 ---
 
+## Preview
+
+<p align="center">
+  <img src="./public/demo.gif" alt="Performance Hero demo" width="720" />
+</p>
+
+---
+
 ## Docs
 
 - [Architecture decisions](./docs/architecture.md) — every major tech choice
