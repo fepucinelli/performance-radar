@@ -175,7 +175,9 @@ src/
 │   │   ├── pagespeed.ts           # PSI API client (all 4 Lighthouse categories)
 │   │   └── crux-history.ts        # CrUX History API (25-week P75 data)
 │   ├── ai/
-│   │   └── action-plan.ts         # AI action plan generation (tiered model per plan)
+│   │   ├── action-plan.ts         # AI action plan generation (tiered model per plan)
+│   │   ├── prompts.ts             # Gitignored — real prompt content (local only)
+│   │   └── prompts.example.ts     # Committed template; copied to prompts.ts on fresh clone
 │   ├── db/
 │   │   ├── index.ts               # Drizzle + Neon client
 │   │   └── schema.ts              # Single source of truth for all tables
@@ -219,7 +221,12 @@ src/
 git clone https://github.com/fepucinelli/perfhero.git
 cd perfhero
 pnpm install
+pnpm prepare:prompts   # copies prompts.example.ts → prompts.ts if absent
 ```
+
+**Note:** `src/lib/ai/prompts.ts` is gitignored and holds the real AI prompt
+content. After running `prepare:prompts`, replace the placeholder strings in
+that file with your actual prompts.
 
 ### 2. Environment variables
 
@@ -304,6 +311,7 @@ pnpm lint                            # ESLint
 pnpm exec tsc --noEmit              # Type check
 pnpm exec drizzle-kit push --force  # Push schema changes to DB
 pnpm db:studio                       # Drizzle Studio (visual DB explorer)
+pnpm prepare:prompts                 # Copy prompts.example.ts → prompts.ts (run after cloning)
 ```
 
 ---

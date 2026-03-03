@@ -293,6 +293,26 @@ revenue.
 API failure, malformed JSON) silently falls back to the static plan. AI
 generation never blocks the audit save.
 
+**Prompt files:**
+
+The system prompt and user prompt builder live in `src/lib/ai/prompts.ts`,
+which is gitignored so the prompt content never appears in version history or
+public forks. A committed `src/lib/ai/prompts.example.ts` provides the same
+function signatures with placeholder text so the project compiles on a fresh
+clone.
+
+```
+src/lib/ai/
+├── action-plan.ts       # Imports getSystemPrompt + buildUserPrompt from ./prompts
+├── prompts.ts           # GITIGNORED — real prompt content (local and CI only)
+└── prompts.example.ts   # Committed template; copied to prompts.ts via prepare:prompts
+```
+
+After cloning, run `pnpm prepare:prompts` to create `prompts.ts` from the
+example, then replace the placeholder strings with your real prompts. On CI,
+add the same command before the build step (or seed `prompts.ts` from a secret
+file).
+
 ---
 
 ## PDF generation: @react-pdf/renderer
